@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VERIDEX — DEA Forensic Routing &amp; Identification · LOM 7300</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  :root {
+    --bg-base: #f7f6f1; --bg-surface: #ffffff; --bg-raised: #fbfaf6; --bg-subtle: #f1efe9; --bg-inset: #eeece4;
+    --border: #e3dfd4; --border-strong: #d4cfc1; --border-soft: #ebe7dc;
+    --text-primary: #1a1a1a; --text-secondary: #5a5a5a; --text-tertiary: #94908a;
+    --accent: #0f2a4a; --accent-strong: #143862; --accent-soft: rgba(15,42,74,0.06); --accent-line: rgba(15,42,74,0.18);
+    --gold: #8a5a14; --gold-strong: #6f4810; --gold-soft: rgba(138,90,20,0.08); --gold-line: rgba(138,90,20,0.22);
+    --evidence: #962c2c; --evidence-soft: rgba(150,44,44,0.08);
+    --success: #1e6e3f; --success-soft: rgba(30,110,63,0.09);
+    --warning: #a85a09; --warning-soft: rgba(168,90,9,0.1);
+    --info: #1e4ea0; --info-soft: rgba(30,78,160,0.08);
+    --display: 'Fraunces', Georgia, serif; --sans: 'IBM Plex Sans', system-ui, sans-serif; --mono: 'IBM Plex Mono', 'SF Mono', monospace;
+    --shadow-sm: 0 1px 2px rgba(20,20,20,0.04); --shadow-md: 0 4px 12px rgba(20,20,20,0.06); --shadow-lg: 0 16px 40px -8px rgba(20,20,20,0.1);
+  }
+  body { font-family: var(--sans); color: var(--text-primary); background: var(--bg-base); background-image: radial-gradient(circle at 0% 0%, rgba(138,90,20,0.04) 0%, transparent 50%), radial-gradient(circle at 100% 100%, rgba(15,42,74,0.03) 0%, transparent 50%); font-size: 14px; line-height: 1.5; letter-spacing: -0.005em; -webkit-font-smoothing: antialiased; }
+  .font-mono { font-family: var(--mono); }
+  .evidence-stripe { height: 3px; background: repeating-linear-gradient(45deg, var(--gold) 0px, var(--gold) 10px, #1a1a1a 10px, #1a1a1a 20px); }
+  .container { max-width: 1480px; margin: 0 auto; padding: 0 32px; }
+  header.topbar { background: rgba(255,255,255,0.88); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; }
+  .topbar-inner { height: 68px; display: flex; align-items: center; justify-content: space-between; }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .brand-mark { width: 38px; height: 38px; background: var(--accent); border-radius: 4px; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: var(--shadow-sm), inset 0 0 0 1px rgba(255,255,255,0.1); }
+  .brand-mark::before { content: ''; position: absolute; inset: -2px; border: 1px solid var(--accent); border-radius: 5px; opacity: 0.2; }
+  .brand-mark .pulse { position: absolute; top: -2px; right: -2px; width: 7px; height: 7px; background: var(--success); border-radius: 50%; border: 1.5px solid var(--bg-surface); animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.55;transform:scale(0.85)} }
+  .brand-text .name { font-family: var(--display); font-size: 18px; font-weight: 600; line-height: 1; letter-spacing: -0.01em; }
+  .brand-text .name .ax { color: var(--gold); }
+  .brand-text .tagline { font-size: 9.5px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.2em; margin-top: 4px; font-weight: 500; }
+  .breadcrumb { display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 11.5px; color: var(--text-secondary); padding-left: 36px; margin-left: 36px; border-left: 1px solid var(--border); }
+  .breadcrumb b { color: var(--text-primary); font-weight: 500; }
+  .topbar-right { display: flex; align-items: center; gap: 14px; }
+  .icon-btn { background: transparent; border: 1px solid var(--border); border-radius: 4px; width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); position: relative; transition: all 0.12s; }
+  .icon-btn:hover { color: var(--text-primary); border-color: var(--border-strong); background: var(--bg-surface); }
+  .icon-btn .badge { position: absolute; top: -5px; right: -5px; background: var(--evidence); color: white; font-family: var(--mono); font-size: 9.5px; font-weight: 600; border-radius: 999px; padding: 1px 5px; line-height: 1.3; border: 1.5px solid var(--bg-surface); }
+  .user-chip { display: flex; align-items: center; gap: 10px; padding-left: 14px; border-left: 1px solid var(--border); }
+  .avatar { width: 32px; height: 32px; border-radius: 4px; background: linear-gradient(135deg, #1e4ea0 0%, #0f2a4a 100%); color: white; display: flex; align-items: center; justify-content: center; font-size: 11.5px; font-weight: 600; font-family: var(--mono); }
+  .user-info .name { font-size: 13px; font-weight: 500; line-height: 1.2; }
+  .user-info .role { font-size: 10px; color: var(--text-tertiary); font-family: var(--mono); margin-top: 2px; letter-spacing: 0.04em; }
+  nav.tabs { background: var(--bg-surface); border-bottom: 1px solid var(--border); }
+  .tabs-inner { display: flex; align-items: center; justify-content: space-between; }
+  .tab-list { display: flex; }
+  .tab { background: transparent; border: none; padding: 16px 20px; color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; border-bottom: 2px solid transparent; transition: all 0.12s; font-family: var(--sans); margin-bottom: -1px; }
+  .tab:hover { color: var(--text-primary); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab svg { width: 15px; height: 15px; }
+  .status-pill { font-family: var(--mono); font-size: 10.5px; color: var(--text-secondary); display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: var(--success-soft); border-radius: 999px; border: 1px solid rgba(30,110,63,0.15); }
+  .status-pill svg { width: 11px; height: 11px; color: var(--success); }
+  main { padding: 36px 0 80px; }
+  .page-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 28px; flex-wrap: wrap; }
+  .eyebrow { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.18em; color: var(--gold); font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
+  .eyebrow.dot::before { content: ''; width: 5px; height: 5px; background: var(--gold); border-radius: 50%; }
+  .h1 { font-family: var(--display); font-size: 34px; font-weight: 500; line-height: 1.05; margin-top: 10px; letter-spacing: -0.02em; }
+  .lede { color: var(--text-secondary); font-size: 14px; max-width: 620px; margin-top: 10px; line-height: 1.55; }
+  .card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 6px; box-shadow: var(--shadow-sm); }
+  .card-section-label { display: flex; align-items: center; gap: 14px; padding: 14px 22px; border-bottom: 1px solid var(--border); background: var(--bg-raised); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.18em; color: var(--text-secondary); font-weight: 600; }
+  .card-section-label .num { width: 22px; height: 22px; background: var(--accent); color: white; border-radius: 3px; display: inline-flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 0; }
+  .form-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; padding: 22px; }
+  .col-12 { grid-column: span 12; } .col-6 { grid-column: span 6; } .col-4 { grid-column: span 4; } .col-3 { grid-column: span 3; } .col-8 { grid-column: span 8; } .col-2 { grid-column: span 2; }
+  label.field-label { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--text-secondary); margin-bottom: 7px; font-weight: 600; }
+  .input, select.input, textarea.input { background: var(--bg-surface); border: 1px solid var(--border-strong); color: var(--text-primary); font-family: var(--sans); font-size: 13px; padding: 10px 12px; border-radius: 4px; width: 100%; transition: all 0.12s; outline: none; box-shadow: inset 0 1px 2px rgba(20,20,20,0.03); }
+  .input.mono { font-family: var(--mono); font-size: 12.5px; }
+  textarea.input { resize: vertical; min-height: 76px; font-family: var(--sans); }
+  .input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(15,42,74,0.08); }
+  .input::placeholder { color: var(--text-tertiary); }
+  select.input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%2394908a' d='M5 6L0 0h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+  .input-hint { font-size: 10.5px; color: var(--text-tertiary); margin-top: 5px; display: flex; align-items: center; gap: 5px; }
+  .input-hint svg { width: 10px; height: 10px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 4px; font-family: var(--sans); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent; transition: all 0.12s; letter-spacing: 0.005em; }
+  .btn svg { width: 14px; height: 14px; }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: var(--accent-strong); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+  .btn-gold { background: var(--gold); color: white; }
+  .btn-gold:hover { background: var(--gold-strong); }
+  .btn-ghost { background: var(--bg-surface); color: var(--text-secondary); border-color: var(--border-strong); }
+  .btn-ghost:hover { color: var(--text-primary); background: var(--bg-raised); }
+  .btn-text { background: transparent; color: var(--text-secondary); padding: 6px 8px; }
+  .badge-pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px; border-radius: 3px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; font-family: var(--mono); }
+  .badge-pill svg { width: 10px; height: 10px; }
+  .b-success { background: var(--success-soft); color: var(--success); }
+  .b-gold { background: var(--gold-soft); color: var(--gold); }
+  .b-info { background: var(--info-soft); color: var(--info); }
+  .b-evidence { background: var(--evidence-soft); color: var(--evidence); }
+  .b-warning { background: var(--warning-soft); color: var(--warning); }
+  .b-neutral { background: var(--bg-subtle); color: var(--text-secondary); border: 1px solid var(--border); }
+  .submit-grid { display: grid; grid-template-columns: 1fr 380px; gap: 24px; }
+  @media (max-width: 1100px) { .submit-grid { grid-template-columns: 1fr; } }
+  .coc-row { display: grid; grid-template-columns: 70px 1fr auto; gap: 18px; padding: 14px 22px; border-bottom: 1px solid var(--border); align-items: center; }
+  .coc-row.current { background: var(--gold-soft); }
+  .coc-row.done { background: var(--success-soft); }
+  .coc-time { font-family: var(--mono); font-size: 12px; color: var(--text-secondary); }
+  .coc-main .actor { font-size: 13.5px; font-weight: 500; }
+  .coc-main .actor .role-tag { color: var(--text-tertiary); font-weight: 400; font-size: 12px; }
+  .coc-main .action { font-size: 12.5px; color: var(--text-secondary); margin-top: 3px; }
+  .coc-main .form-ref { font-family: var(--mono); font-size: 10.5px; color: var(--accent); background: var(--accent-soft); padding: 1px 6px; border-radius: 3px; margin-left: 8px; }
+  .advisor { position: sticky; top: 100px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; box-shadow: var(--shadow-md); }
+  .advisor-header { padding: 18px 22px; border-bottom: 1px solid var(--border); background: linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-raised) 100%); display: flex; align-items: center; justify-content: space-between; }
+  .advisor-rec { padding: 22px; background: linear-gradient(165deg, var(--accent) 0%, var(--accent-strong) 100%); color: white; position: relative; overflow: hidden; transition: all 0.4s ease; }
+  .advisor-rec::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle at 100% 0%, rgba(138,90,20,0.25) 0%, transparent 60%), radial-gradient(circle at 0% 100%, rgba(255,255,255,0.05) 0%, transparent 40%); pointer-events: none; }
+  .advisor-rec > * { position: relative; z-index: 1; }
+  .advisor-rec.recalc { opacity: 0.5; transform: scale(0.99); }
+  .advisor-rec .code { font-family: var(--mono); font-size: 10.5px; color: rgba(255,207,107,0.95); font-weight: 600; letter-spacing: 0.06em; }
+  .advisor-rec .lab-name { font-family: var(--display); font-size: 19px; font-weight: 500; margin-top: 5px; line-height: 1.15; }
+  .advisor-rec .lab-loc { font-size: 12.5px; color: rgba(255,255,255,0.75); display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; }
+  .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 18px; }
+  .stat-grid .label { font-size: 9.5px; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600; }
+  .stat-grid .value { font-family: var(--mono); font-size: 24px; font-weight: 600; margin-top: 4px; line-height: 1; }
+  .stat-grid .unit { font-size: 11px; color: rgba(255,255,255,0.7); margin-left: 3px; font-family: var(--sans); }
+  .advisor-reason { margin-top: 16px; padding: 11px 13px; background: rgba(0,0,0,0.18); border-radius: 4px; font-size: 11.5px; color: rgba(255,255,255,0.9); line-height: 1.5; border-left: 2px solid var(--gold); }
+  .advisor-reason b { color: rgb(255,207,107); font-weight: 600; }
+  .advisor-reason .factor { display: block; margin-top: 4px; padding-left: 12px; position: relative; color: rgba(255,255,255,0.78); }
+  .advisor-reason .factor:first-of-type { margin-top: 8px; }
+  .advisor-reason .factor::before { content: '·'; position: absolute; left: 4px; color: var(--gold); font-weight: 700; }
+  .lab-row { padding: 13px 22px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.1s; }
+  .lab-row:hover { background: var(--bg-raised); }
+  .lab-row:last-child { border-bottom: none; }
+  .lab-row-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .lab-row .sfl { font-family: var(--mono); font-size: 9.5px; color: var(--accent); font-weight: 600; letter-spacing: 0.04em; }
+  .lab-row .code { font-family: var(--mono); font-size: 10px; color: var(--text-tertiary); margin-top: 1px; }
+  .lab-row .name { font-size: 13px; font-weight: 500; margin-top: 2px; line-height: 1.3; }
+  .lab-row .loc { font-size: 11px; color: var(--text-secondary); margin-top: 3px; }
+  .lab-row .specialty-match { display: inline-flex; align-items: center; gap: 4px; font-size: 9.5px; color: var(--gold); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+  .lab-row .specialty-match svg { width: 9px; height: 9px; }
+  .lab-row .eta { text-align: right; }
+  .lab-row .eta .num { font-family: var(--mono); font-size: 16px; font-weight: 600; }
+  .lab-row .eta .unit { font-size: 10px; color: var(--text-tertiary); margin-left: 2px; }
+  .lab-row .eta .status { display: flex; align-items: center; gap: 5px; justify-content: flex-end; margin-top: 3px; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; }
+  .lab-row .eta .dot { width: 5px; height: 5px; border-radius: 50%; }
+  .progress-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 6px; padding: 24px; box-shadow: var(--shadow-sm); }
+  .progress-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 32px; flex-wrap: wrap; margin-bottom: 18px; }
+  .progress-label { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.16em; font-weight: 600; }
+  .progress-pct { font-family: var(--display); font-size: 42px; font-weight: 500; line-height: 1; margin-top: 8px; color: var(--accent); }
+  .progress-pct .pct-unit { font-size: 22px; color: var(--text-secondary); margin-left: 3px; }
+  .progress-stages-stat { font-family: var(--mono); font-size: 12px; color: var(--text-secondary); margin-top: 6px; }
+  .progress-stats { display: flex; gap: 32px; }
+  .progress-stat { text-align: right; }
+  .progress-stat .label { font-size: 9.5px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600; }
+  .progress-stat .value { font-family: var(--mono); font-size: 22px; font-weight: 600; margin-top: 4px; }
+  .progress-stat.accent .value { color: var(--gold); }
+  .progress-bar { height: 6px; background: var(--bg-inset); border-radius: 3px; overflow: hidden; position: relative; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--success) 0%, var(--gold) 100%); transition: width 0.4s; }
+  .progress-markers { display: flex; justify-content: space-between; margin-top: 10px; font-family: var(--mono); font-size: 9.5px; color: var(--text-tertiary); letter-spacing: 0.04em; }
+  .stage { position: relative; padding-left: 62px; padding-bottom: 24px; }
+  .stage:last-child { padding-bottom: 0; }
+  .stage-line { position: absolute; left: 22px; top: 44px; bottom: 0; width: 1.5px; background: var(--border); }
+  .stage-line.done { background: var(--success); }
+  .stage-line.active { background: linear-gradient(180deg, var(--gold) 0%, var(--border) 100%); }
+  .stage-marker { position: absolute; left: 0; top: 0; width: 44px; height: 44px; border-radius: 5px; display: flex; align-items: center; justify-content: center; background: var(--bg-surface); border: 1.5px solid var(--border); color: var(--text-tertiary); }
+  .stage-marker.done { background: var(--success); border-color: var(--success); color: white; }
+  .stage-marker.active { background: var(--gold); border-color: var(--gold); color: white; animation: pulse 2s ease-in-out infinite; }
+  .stage-marker svg { width: 18px; height: 18px; }
+  .stage-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .stage-num { font-family: var(--mono); font-size: 10.5px; color: var(--text-tertiary); }
+  .stage-title { font-family: var(--display); font-size: 17px; font-weight: 500; }
+  .stage-title.muted { color: var(--text-secondary); }
+  .stage-desc { font-size: 12.5px; color: var(--text-secondary); margin-top: 6px; line-height: 1.55; }
+  .stage-meta { display: flex; gap: 22px; margin-top: 10px; flex-wrap: wrap; font-size: 11.5px; color: var(--text-secondary); }
+  .stage-meta span { display: inline-flex; align-items: center; gap: 6px; }
+  .stage-meta svg { width: 11px; height: 11px; color: var(--text-tertiary); }
+  .stage-right { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  .stage-complete-time { font-family: var(--mono); font-size: 12.5px; color: var(--success); white-space: nowrap; }
+  .stage-progress-num { font-family: var(--mono); font-size: 19px; font-weight: 600; color: var(--gold); }
+  .stage-progress-bar { width: 88px; height: 3px; background: var(--bg-inset); border-radius: 2px; margin-top: 5px; overflow: hidden; }
+  .stage-progress-bar > div { height: 100%; background: var(--gold); }
+  .status-grid { display: grid; grid-template-columns: 1fr 360px; gap: 24px; margin-top: 24px; }
+  @media (max-width: 1100px) { .status-grid { grid-column: 1fr; } }
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  @media (max-width: 900px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+  .kpi { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 6px; padding: 20px; position: relative; overflow: hidden; box-shadow: var(--shadow-sm); }
+  .kpi-label { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600; display: flex; align-items: center; gap: 7px; }
+  .kpi-label svg { width: 12px; height: 12px; color: var(--text-tertiary); }
+  .kpi-value-row { display: flex; align-items: baseline; gap: 10px; margin-top: 12px; }
+  .kpi-value { font-family: var(--display); font-size: 30px; font-weight: 500; line-height: 1; letter-spacing: -0.02em; }
+  .kpi-value .unit { font-size: 14px; color: var(--text-secondary); margin-left: 4px; font-weight: 400; }
+  .kpi-delta { font-family: var(--mono); font-size: 11px; display: inline-flex; align-items: center; gap: 3px; }
+  .kpi-delta.up { color: var(--success); } .kpi-delta.down-good { color: var(--success); } .kpi-delta.down-bad { color: var(--evidence); }
+  .kpi-hint { font-size: 11px; color: var(--text-tertiary); margin-top: 8px; }
+  .chart-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 6px; padding: 22px; box-shadow: var(--shadow-sm); }
+  .chart-card-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; gap: 12px; flex-wrap: wrap; }
+  .chart-card-title { font-family: var(--display); font-size: 18px; font-weight: 500; }
+  .chart-card-eyebrow { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600; }
+  .chart-legend { display: flex; gap: 14px; }
+  .legend-item { font-size: 11px; color: var(--text-secondary); display: inline-flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 9px; height: 9px; border-radius: 2px; }
+  .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .data-table thead tr { background: var(--bg-raised); }
+  .data-table th { padding: 11px 16px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-secondary); font-weight: 600; border-bottom: 1px solid var(--border); }
+  .data-table td { padding: 14px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: var(--bg-raised); }
+  .util-bar { display: flex; align-items: center; gap: 8px; }
+  .util-bar .bar { flex: 1; height: 4px; background: var(--bg-inset); border-radius: 2px; overflow: hidden; }
+  .util-bar .bar > div { height: 100%; }
+  .util-bar .pct { font-family: var(--mono); font-size: 10.5px; min-width: 30px; }
+  .roster-row { padding: 12px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 14px; }
+  .roster-row:last-child { border-bottom: none; }
+  .roster-row .info { flex: 1; min-width: 0; }
+  .roster-row .info .nm { font-size: 13px; font-weight: 500; }
+  .roster-row .info .role { font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
+  .roster-row .right { text-align: right; }
+  .roster-row .right .cs { font-family: var(--mono); font-size: 11px; color: var(--text-secondary); }
+  .instrument-row { padding: 13px 22px; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 110px 1fr 120px 100px 90px; gap: 14px; align-items: center; }
+  .instrument-row:last-child { border-bottom: none; }
+  .instrument-row .code { font-family: var(--mono); font-size: 11px; color: var(--accent); font-weight: 500; }
+  .instrument-row .name { font-size: 12.5px; font-weight: 500; }
+  .instrument-row .meta { font-size: 9.5px; color: var(--text-tertiary); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .int-row { padding: 18px 22px; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; }
+  .int-row:last-child { border-bottom: none; }
+  .int-left { display: grid; grid-template-columns: 44px 1fr; gap: 14px; align-items: center; }
+  .int-icon { width: 44px; height: 44px; border-radius: 5px; display: flex; align-items: center; justify-content: center; }
+  .int-icon svg { width: 18px; height: 18px; }
+  .int-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .int-head .lab { font-size: 14px; font-weight: 500; }
+  .int-head .sfl-code { font-family: var(--mono); font-size: 10.5px; color: var(--accent); font-weight: 600; background: var(--accent-soft); padding: 1px 7px; border-radius: 3px; }
+  .int-head .code { font-family: var(--mono); font-size: 10.5px; color: var(--text-tertiary); }
+  .int-meta { display: flex; align-items: center; gap: 18px; margin-top: 7px; font-family: var(--mono); font-size: 11px; color: var(--text-secondary); flex-wrap: wrap; }
+  .int-meta span { display: inline-flex; align-items: center; gap: 5px; }
+  .int-meta svg { width: 11px; height: 11px; color: var(--text-tertiary); }
+  .int-right { display: grid; grid-template-columns: repeat(3, auto) auto; gap: 22px; align-items: center; }
+  .int-metric { text-align: right; }
+  .int-metric .lbl { font-size: 9px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; }
+  .int-metric .val { font-family: var(--mono); font-size: 12px; margin-top: 3px; }
+  .policy-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .policy-row:last-child { border-bottom: none; }
+  .policy-row .lbl { color: var(--text-secondary); }
+  .policy-row .val { font-family: var(--mono); font-size: 12.5px; }
+  .audit-toolbar { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 6px; padding: 14px 18px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; box-shadow: var(--shadow-sm); }
+  .audit-search { flex: 1; min-width: 220px; position: relative; }
+  .audit-search input { background: var(--bg-raised); border: 1px solid var(--border); padding: 9px 12px 9px 36px; border-radius: 4px; width: 100%; font-size: 13px; font-family: var(--sans); outline: none; transition: all 0.12s; }
+  .audit-search input:focus { border-color: var(--accent); background: var(--bg-surface); box-shadow: 0 0 0 3px rgba(15,42,74,0.08); }
+  .audit-search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--text-tertiary); }
+  .audit-search .clear { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); cursor: pointer; padding: 4px; opacity: 0; transition: opacity 0.15s; color: var(--text-tertiary); }
+  .audit-search input:not(:placeholder-shown) ~ .clear { opacity: 1; }
+  .audit-search .clear:hover { color: var(--text-primary); }
+  .audit-filter { background: var(--bg-raised); border: 1px solid var(--border); padding: 9px 30px 9px 12px; border-radius: 4px; font-size: 12.5px; color: var(--text-primary); font-family: var(--sans); outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%2394908a' d='M5 6L0 0h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; cursor: pointer; transition: all 0.12s; }
+  .audit-filter:hover { border-color: var(--border-strong); }
+  .audit-filter:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(15,42,74,0.08); }
+  .audit-filter.active { border-color: var(--accent); background-color: var(--accent-soft); color: var(--accent); font-weight: 500; }
+  .filter-clear-btn { background: transparent; border: none; color: var(--text-secondary); font-size: 12px; cursor: pointer; padding: 4px 8px; display: inline-flex; align-items: center; gap: 5px; }
+  .filter-clear-btn:hover { color: var(--evidence); }
+  .filter-clear-btn svg { width: 12px; height: 12px; }
+  .audit-event { display: grid; grid-template-columns: 130px 30px 1fr auto; gap: 18px; padding: 16px 22px; border-bottom: 1px solid var(--border); align-items: flex-start; transition: background 0.1s; }
+  .audit-event:last-child { border-bottom: none; }
+  .audit-event:hover { background: var(--bg-raised); }
+  .audit-time { font-family: var(--mono); font-size: 11.5px; color: var(--text-secondary); padding-top: 2px; }
+  .audit-time .date { color: var(--text-tertiary); font-size: 10px; display: block; }
+  .audit-icon { width: 30px; height: 30px; border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .audit-icon svg { width: 14px; height: 14px; }
+  .audit-icon.gold { background: var(--gold-soft); color: var(--gold); }
+  .audit-icon.success { background: var(--success-soft); color: var(--success); }
+  .audit-icon.info { background: var(--info-soft); color: var(--info); }
+  .audit-icon.evidence { background: var(--evidence-soft); color: var(--evidence); }
+  .audit-icon.neutral { background: var(--bg-subtle); color: var(--text-secondary); }
+  .audit-body .action { font-size: 13.5px; font-weight: 500; line-height: 1.35; }
+  .audit-body .action b { font-weight: 600; }
+  .audit-body .action code { font-family: var(--mono); font-size: 12px; background: var(--bg-inset); padding: 1px 6px; border-radius: 3px; color: var(--text-primary); }
+  .audit-body .action mark { background: var(--gold-soft); color: var(--text-primary); font-weight: 600; padding: 0 2px; border-radius: 2px; }
+  .audit-body .who { font-size: 12px; color: var(--text-secondary); margin-top: 4px; display: flex; gap: 14px; flex-wrap: wrap; }
+  .audit-body .who span { display: inline-flex; align-items: center; gap: 5px; }
+  .audit-body .who svg { width: 11px; height: 11px; color: var(--text-tertiary); }
+  .audit-body .hash { font-family: var(--mono); font-size: 10.5px; color: var(--text-tertiary); margin-top: 6px; display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px; background: var(--bg-subtle); border-radius: 3px; }
+  .audit-body .hash svg { width: 10px; height: 10px; }
+  .audit-right { text-align: right; display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+  .sev-critical { background: var(--evidence-soft); color: var(--evidence); }
+  .sev-high { background: var(--warning-soft); color: var(--warning); }
+  .sev-standard { background: var(--bg-subtle); color: var(--text-secondary); border: 1px solid var(--border); }
+  .audit-empty { padding: 64px 22px; text-align: center; color: var(--text-secondary); }
+  .audit-empty .ico { width: 56px; height: 56px; background: var(--bg-subtle); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+  .audit-empty .ico svg { width: 24px; height: 24px; color: var(--text-tertiary); }
+  .audit-empty .title { font-family: var(--display); font-size: 18px; color: var(--text-primary); margin-bottom: 6px; }
+  .audit-empty .desc { font-size: 13px; }
+  .reagent-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 0; border-bottom: 1px dashed var(--border); font-size: 12.5px; }
+  .reagent-row:last-child { border-bottom: none; }
+  .reagent-row .name { font-weight: 500; }
+  .reagent-row .result { font-family: var(--mono); font-size: 11.5px; display: inline-flex; align-items: center; gap: 6px; }
+  .reagent-row .result.pos { color: var(--success); }
+  .reagent-row .result.pending { color: var(--text-tertiary); }
+  .reagent-row .result .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .activity-item { display: flex; gap: 14px; padding: 8px 0; border-bottom: 1px dashed var(--border); }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-item .t { font-family: var(--mono); font-size: 11px; color: var(--text-tertiary); min-width: 38px; flex-shrink: 0; }
+  .activity-item .txt { font-size: 12px; color: var(--text-secondary); line-height: 1.45; }
+  .flex { display: flex; } .items-center { align-items: center; } .justify-between { justify-content: space-between; }
+  .gap-2 { gap: 8px; } .gap-3 { gap: 12px; } .gap-4 { gap: 16px; }
+  .mb-2 { margin-bottom: 8px; } .mb-4 { margin-bottom: 16px; } .mb-6 { margin-bottom: 24px; }
+  .mt-2 { margin-top: 8px; } .mt-4 { margin-top: 16px; } .mt-6 { margin-top: 24px; }
+  .grid-12-7-5 { display: grid; grid-template-columns: 7fr 5fr; gap: 16px; }
+  .grid-12-5-7 { display: grid; grid-template-columns: 5fr 7fr; gap: 16px; }
+  .grid-12-6-6 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 1100px) { .grid-12-7-5, .grid-12-5-7, .grid-12-6-6 { grid-template-columns: 1fr; } }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  ::-webkit-scrollbar { width: 9px; height: 9px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--accent); color: white; padding: 14px 20px; border-radius: 6px; font-size: 13px; box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 10px; z-index: 100; opacity: 0; transform: translateY(20px); pointer-events: none; transition: all 0.25s; }
+  .toast.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .toast svg { width: 16px; height: 16px; color: var(--gold); }
+</style>
+</head>
+<body>
+
+<div class="evidence-stripe"></div>
+
+<header class="topbar">
+  <div class="container topbar-inner">
+    <div style="display:flex; align-items:center;">
+      <div class="brand">
+        <div class="brand-mark">
+          <i data-lucide="fingerprint" style="color:#ffcf6b; width:18px; height:18px;"></i>
+          <div class="pulse"></div>
+        </div>
+        <div class="brand-text">
+          <div class="name">VERIDEX<span class="ax"> / DEA</span></div>
+          <div class="tagline">Forensic Routing &amp; Identification · LOM 7300</div>
+        </div>
+      </div>
+      <div class="breadcrumb">
+        <!-- IA Case Number (field office) vs LIMS Case Number (lab-assigned) are distinct per §7302.3 -->
+        <span>IA Case: OP-2026-BWI-04781</span>
+        <i data-lucide="chevron-right" style="width:12px; height:12px;"></i>
+        <span>LIMS: <b>SFL3-2026-04781</b></span>
+        <i data-lucide="chevron-right" style="width:12px; height:12px;"></i>
+        <b>IA Exhibit EX-44291-A</b>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="icon-btn"><i data-lucide="bell" style="width:15px; height:15px;"></i><span class="badge">3</span></button>
+      <button class="icon-btn"><i data-lucide="help-circle" style="width:15px; height:15px;"></i></button>
+      <div class="user-chip">
+        <div class="avatar">JR</div>
+        <div class="user-info">
+          <div class="name">SA J. Reyes</div>
+          <!-- SA = Special Agent (submitting field agent, not lab staff per §7301.1) -->
+          <div class="role">BADGE 47892 · SA · DEA BWI GRP 4</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="container tabs-inner">
+    <div class="tab-list">
+      <button class="tab active" data-tab="submit"><i data-lucide="plus-square"></i>Submit Exhibit</button>
+      <button class="tab" data-tab="status"><i data-lucide="activity"></i>Case Status</button>
+      <button class="tab" data-tab="lab"><i data-lucide="layout-dashboard"></i>Lab Management</button>
+      <button class="tab" data-tab="audit"><i data-lucide="shield-check"></i>Audit Trail</button>
+      <button class="tab" data-tab="admin"><i data-lucide="settings"></i>Administration</button>
+    </div>
+    <div class="status-pill"><i data-lucide="signal"></i><span>9/9 LABS ONLINE · LIMS NOMINAL</span></div>
+  </div>
+</nav>
+
+<main>
+<div class="container">
+
+<!-- ============ SUBMIT EXHIBIT ============ -->
+<section class="tab-content active" id="tab-submit">
+  <div class="page-header">
+    <div>
+      <!-- LOM 7302: evidence must be received, reviewed, then accepted into LIMS (3 steps) -->
+      <div class="eyebrow">DRAFT · PENDING DEA-7 SUBMISSION TO LIMS</div>
+      <h1 class="h1">New Exhibit Submission</h1>
+      <p class="lede">Complete the DEA-7 evidence record and chain of custody documentation. The routing engine recommends the optimal DEA laboratory based on capacity, instrument availability, specialty match, and predicted turnaround. Per LOM §7302, the Evidence Specialist (ES) must accept the exhibit into LIMS within 4 business days of receipt.</p>
+    </div>
+  </div>
+
+  <div class="submit-grid">
+    <div>
+      <!-- SECTION 01: DEA-7 Evidence Particulars -->
+      <div class="card mb-6">
+        <div class="card-section-label">
+          <span class="num">01</span>
+          <span>DEA-7 · Evidence Particulars</span>
+          <!-- DEA-7 = Report of Drug Property Collected, Purchased, or Seized (§7301.2) -->
+          <span style="margin-left:auto; font-size:9.5px; color: var(--text-tertiary);">DEA-7 · Report of Drug Property Collected, Purchased, or Seized</span>
+        </div>
+        <div class="form-grid">
+          <div class="col-4">
+            <!-- IA Exhibit Number = field office number; LIMS number assigned separately on acceptance (§7302.3) -->
+            <label class="field-label">IA Exhibit Number</label>
+            <input class="input mono" value="EX-44291-A" />
+            <div class="input-hint"><i data-lucide="info"></i>Field-assigned · LIMS number auto-generated on acceptance (§7302.3)</div>
+          </div>
+          <div class="col-4">
+            <label class="field-label">IA Case Number</label>
+            <input class="input mono" value="OP-2026-BWI-04781" />
+            <div class="input-hint"><i data-lucide="info"></i>Investigating Agency case number as on DEA-7</div>
+          </div>
+          <div class="col-4">
+            <label class="field-label">LIMS Case Number</label>
+            <input class="input mono" placeholder="Auto-assigned on ES acceptance" disabled style="background: var(--bg-inset); color: var(--text-tertiary);" />
+            <div class="input-hint"><i data-lucide="info"></i>Assigned by ES at LIMS acceptance · SFL3-YYYY-XXXXX</div>
+          </div>
+          <div class="col-6">
+            <label class="field-label">Suspected controlled substance (Alleged Drug · DEA-7 Item)</label>
+            <select class="input" id="input-substance">
+              <option value="cocaine-hcl">Cocaine HCl</option>
+              <option value="cocaine-base">Cocaine base (crack)</option>
+              <option value="heroin">Heroin</option>
+              <option value="fentanyl">Fentanyl</option>
+              <option value="methamphetamine">Methamphetamine</option>
+              <option value="mdma">MDMA</option>
+              <option value="m30-tablets">Counterfeit M30 pressed tablets</option>
+              <option value="unknown">Unknown / Suspected Schedule I-II</option>
+            </select>
+          </div>
+          <div class="col-3">
+            <label class="field-label">Physical form</label>
+            <select class="input">
+              <option>Powder</option><option>Crystalline</option><option>Pressed tablet</option>
+              <option>Resin</option><option>Liquid</option><option>Plant material</option>
+            </select>
+          </div>
+          <div class="col-3">
+            <label class="field-label">Amount Submitted (g) · DEA-7</label>
+            <input class="input mono" value="14.8" />
+          </div>
+          <div class="col-4">
+            <!-- Container type per §7302.22 / §7303.11: PSEE, SSEE, HSEE, Box, BUL -->
+            <label class="field-label">Container type (§7303)</label>
+            <select class="input">
+              <option value="HSEE">HSEE · Heat-Sealed Evidence Envelope</option>
+              <option value="SSEE">SSEE · Self-Sealing Evidence Envelope</option>
+              <option value="PSEE">PSEE · Plastic Sealed Evidence Envelope</option>
+              <option value="box">Box / oversized container</option>
+              <option value="BUL">BUL · Bulk exhibit</option>
+            </select>
+          </div>
+          <div class="col-4">
+            <label class="field-label">Evidence seal number</label>
+            <input class="input mono" value="DEA-887421" />
+          </div>
+          <div class="col-4">
+            <label class="field-label">Number of containers</label>
+            <input class="input mono" value="1" />
+          </div>
+          <div class="col-12">
+            <label class="field-label">How Obtained / Circumstances of Seizure · DEA-7</label>
+            <textarea class="input">Vehicle interdiction, I-95 northbound near MD-32. Recovered from concealed cavity in vehicle quarter panel during K-9 alert. Suspect arrested at scene. Exhibit packaged and sealed by SA M. Bashir at scene per LOM 7301.4.</textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 02: Chain of Custody (DEA-12 transfers) -->
+      <div class="card mb-6">
+        <div class="card-section-label">
+          <span class="num">02</span>
+          <span>Chain of Custody · DEA-12 Transfers</span>
+          <!-- DEA-12 = Receipt for Cash or other Items; used for all custody transfers (§7305.2) -->
+          <span style="margin-left:auto; font-size:9.5px; color: var(--text-tertiary);">DEA-12 · FRE 901 · 28 CFR 0.103 · LOM §7305</span>
+        </div>
+        <!-- CoC begins at laboratory acceptance into LIMS, not at seizing field office (§7302.3 Note 2) -->
+        <div style="padding: 10px 22px 4px; background: var(--accent-soft); border-bottom: 1px solid var(--accent-line);">
+          <div style="font-size: 11px; color: var(--accent); display:flex; align-items:center; gap:8px;">
+            <i data-lucide="info" style="width:11px; height:11px;"></i>
+            <span>Per LOM §7302.3: laboratory chain of custody initiates on LIMS acceptance by the Evidence Specialist (ES). Pre-submission field custody is documented below for completeness.</span>
+          </div>
+        </div>
+
+        <!-- Step 1: SA seizes (field) -->
+        <div class="coc-row done">
+          <div class="coc-time">14:08<br><span style="font-size:9.5px; color: var(--text-tertiary);">28 May</span></div>
+          <div class="coc-main">
+            <div class="actor">SA M. Bashir <span class="role-tag">· Seizing Agent (SA)</span><span class="form-ref">DEA-7</span></div>
+            <div class="action">I-95 N MM-43 · Initial seizure and sealing · evidence label signed · DEA-887421 affixed · DEA-7 completed</div>
+          </div>
+          <span class="badge-pill b-success"><i data-lucide="check-circle-2"></i>Signed</span>
+        </div>
+        <!-- Step 2: TFO books into evidence (field custody) -->
+        <div class="coc-row done">
+          <div class="coc-time">14:34<br><span style="font-size:9.5px; color: var(--text-tertiary);">28 May</span></div>
+          <div class="coc-main">
+            <div class="actor">TFO Holloway <span class="role-tag">· Task Force Officer (TFO)</span><span class="form-ref">DEA-12</span></div>
+            <div class="action">DEA Baltimore Resident Office · Booked into field evidence vault · CCTV ref CCTV-BLT-2206 · DEA-12 issued</div>
+          </div>
+          <span class="badge-pill b-success"><i data-lucide="check-circle-2"></i>Signed</span>
+        </div>
+        <!-- Step 3: SA (case agent) authorizes submission -->
+        <div class="coc-row current">
+          <div class="coc-time">15:21<br><span style="font-size:9.5px; color: var(--text-tertiary);">28 May</span></div>
+          <div class="coc-main">
+            <div class="actor">SA J. Reyes <span class="role-tag">· Case Agent (SA)</span><span class="form-ref">DEA-7</span></div>
+            <div class="action">DEA BWI Group 4 · Submission authorized · GS R. Patel countersigned (GS-14) · DEA-7 routed to SFL3 MARL</div>
+          </div>
+          <span class="badge-pill b-gold"><i data-lucide="circle-dot"></i>Current</span>
+        </div>
+        <!-- Step 4: ES receives at lab (LIMS acceptance step 1: received) -->
+        <div class="coc-row">
+          <div class="coc-time">—</div>
+          <div class="coc-main">
+            <div class="actor">ES · Evidence Specialist <span class="role-tag">· SFL3 MARL</span><span class="form-ref">LIMS Accept</span></div>
+            <div class="action">Pending: ES receives, reviews packaging integrity, creates LIMS record, affixes LIMS container label · DEA-7 scanned to case file · within 4 business days (§7302)</div>
+          </div>
+          <span class="badge-pill b-neutral"><i data-lucide="clock"></i>Pending</span>
+        </div>
+        <!-- Step 5: LAO assigns to FC -->
+        <div class="coc-row">
+          <div class="coc-time">—</div>
+          <div class="coc-main">
+            <div class="actor">LAO / GS <span class="role-tag">· SFL3 MARL</span></div>
+            <div class="action">Pending: LIMS case assignment to Forensic Chemist (FC) · FC may possess for up to 30 days per §7305.12</div>
+          </div>
+          <span class="badge-pill b-neutral"><i data-lucide="clock"></i>Pending</span>
+        </div>
+        <div style="padding:14px 22px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
+          <div style="font-size:12px; color: var(--text-secondary); display:flex; align-items:center; gap:8px;">
+            <i data-lucide="lock" style="width:13px; height:13px; color: var(--gold);"></i>
+            <span>All transfers recorded via DEA-12 · SHA-256 attested in LIMS · append-only (§7305)</span>
+          </div>
+          <button class="btn btn-ghost"><i data-lucide="plus"></i>Add DEA-12 entry</button>
+        </div>
+      </div>
+
+      <!-- SECTION 03: Analysis Request -->
+      <div class="card mb-6">
+        <div class="card-section-label">
+          <span class="num">03</span>
+          <span>Analysis Request · Routing Criteria</span>
+          <span style="margin-left:auto; font-size:9.5px; color: var(--text-tertiary);">Per LOM §7305.23 · inter-lab authority confirmed</span>
+        </div>
+        <div class="form-grid">
+          <div class="col-4">
+            <label class="field-label">Priority</label>
+            <select class="input" id="input-priority">
+              <option value="urgent">Urgent — speedy trial / AUSA deadline</option>
+              <option value="priority">Priority — pre-indictment</option>
+              <option value="standard">Standard</option>
+            </select>
+          </div>
+          <div class="col-4">
+            <label class="field-label">Quantification required? (DEA-113)</label>
+            <select class="input" id="input-quant">
+              <option value="yes">Yes — sentencing guideline weight (LC-MS/MS)</option>
+              <option value="no">No — qualitative ID only (GC-MS)</option>
+            </select>
+          </div>
+          <div class="col-4">
+            <label class="field-label">AUSA deadline (triggers §7302 expedite)</label>
+            <input class="input" type="date" value="2026-06-04" />
+          </div>
+          <div class="col-12">
+            <label class="field-label">Additional instructions to FC · DEA-86 notes</label>
+            <textarea class="input" placeholder="e.g. preserve reserve sample for defense re-analysis per §7305.22; cutting agent profile required for source attribution; DEA-500 clandestine lab report required if synthesis equipment detected..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between mt-4">
+        <button class="btn btn-ghost"><i data-lucide="chevron-left"></i>Save draft</button>
+        <div class="flex items-center gap-2">
+          <button class="btn btn-ghost">Preview DEA-7</button>
+          <button class="btn btn-primary" onclick="submitExhibit()">
+            Transmit DEA-7 to <span id="submit-btn-lab">SFL3 · MARL</span><i data-lucide="arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROUTING ADVISOR -->
+    <aside>
+      <div class="advisor">
+        <div class="advisor-header">
+          <div>
+            <div style="font-size:10px; text-transform:uppercase; letter-spacing:0.18em; color: var(--gold); font-weight:600;">Routing Advisor · LOM §7305.23</div>
+            <div style="font-family: var(--display); font-size:17px; font-weight:500; margin-top:3px;">Recommended laboratory</div>
+            <div style="font-size:10.5px; color: var(--text-tertiary); margin-top:2px;">No SF authorization required for backlog/capacity routing</div>
+          </div>
+          <div id="advisor-pulse" style="width:8px; height:8px; background: var(--success); border-radius:50%; animation: pulse 2s ease-in-out infinite;"></div>
+        </div>
+
+        <div class="advisor-rec" id="advisor-rec">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+              <div class="code" id="rec-code">SFL3 · Mid-Atlantic Laboratory</div>
+              <div class="lab-name" id="rec-name">MARL · Largo, MD</div>
+              <div class="lab-loc"><i data-lucide="map-pin" style="width:11px; height:11px;"></i><span id="rec-loc">24 mi · SFL3</span></div>
+            </div>
+            <span class="badge-pill" id="rec-badge" style="background: var(--gold); color:white;"><i data-lucide="check-circle-2"></i>OPTIMAL</span>
+          </div>
+          <div class="stat-grid">
+            <div><div class="label">TAT Est.</div><div class="value"><span id="rec-eta">42</span><span class="unit">min</span></div></div>
+            <div><div class="label">Capacity</div><div class="value"><span id="rec-capacity">71</span><span class="unit">%</span></div></div>
+            <div><div class="label">LIMS Queue</div><div class="value" id="rec-queue">14</div></div>
+          </div>
+          <div class="advisor-reason" id="rec-reason">
+            <i data-lucide="zap" style="width:11px; height:11px; display:inline-block; vertical-align:-1px; margin-right:5px;"></i>
+            <span id="rec-headline"><b>Why this lab:</b> Specialty match for cocaine; closest accredited SFL to seizure point.</span>
+            <span id="rec-factors"></span>
+          </div>
+        </div>
+
+        <div>
+          <div style="padding:12px 22px; font-size:10px; text-transform:uppercase; letter-spacing:0.16em; color: var(--text-secondary); font-weight:600; border-bottom: 1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
+            <span>Alternate SFLs (<span id="alt-count">8</span>)</span>
+            <i data-lucide="filter" style="width:12px; height:12px;"></i>
+          </div>
+          <div style="max-height: 400px; overflow-y: auto;" id="alternates-list"></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ============ CASE STATUS ============ -->
+<section class="tab-content" id="tab-status">
+  <div class="page-header">
+    <div>
+      <div class="eyebrow dot">LIMS LIVE · AUTO-REFRESH 30 SEC</div>
+      <!-- Show both IA Exhibit Number and LIMS Case Number clearly -->
+      <h1 class="h1">IA Exhibit EX-44291-A · In Analysis</h1>
+      <p class="lede" style="font-family: var(--mono); font-size: 12px; max-width:none;">
+        Cocaine HCl (alleged) · 14.8 g · SSEE · SFL3 MARL · LIMS SFL3-2026-04781 · Accepted 14:22 · 28 May 2026 · FC: Dr. M. Hernandez
+      </p>
+    </div>
+    <div class="flex items-center gap-2">
+      <button class="btn btn-ghost"><i data-lucide="refresh-cw"></i>Refresh LIMS</button>
+      <!-- DEA-307 = Evidence Accountability Record (§7301.2) -->
+      <button class="btn btn-ghost"><i data-lucide="download"></i>Export DEA-307</button>
+    </div>
+  </div>
+
+  <div class="progress-card mb-6">
+    <div class="progress-top">
+      <div>
+        <div class="progress-label">Overall Examination Progress</div>
+        <div class="progress-pct">39<span class="pct-unit">%</span></div>
+        <div class="progress-stages-stat">3 of 9 examination stages complete · Stage 04 active</div>
+      </div>
+      <div class="progress-stats">
+        <div class="progress-stat"><div class="label">Elapsed</div><div class="value">82m</div></div>
+        <div class="progress-stat accent"><div class="label">Remaining</div><div class="value">~258m</div></div>
+        <div class="progress-stat"><div class="label">DEA-113 Est.</div><div class="value">19:48</div></div>
+      </div>
+    </div>
+    <div class="progress-bar"><div class="progress-bar-fill" style="width:39%;"></div></div>
+    <!-- DEA-113 = Chemical Analysis Report; stages align with FC examination + dual review -->
+    <div class="progress-markers">
+      <span>RECEIPT (ES)</span><span>PRESUMPTIVE (FC)</span><span>GC-MS (FC)</span><span>LC-MS/MS (FC)</span><span>DEA-113 ISSUED</span>
+    </div>
+  </div>
+
+  <div class="status-grid">
+    <div class="card">
+      <div class="card-section-label">
+        <!-- Schedule I-II Identification protocol; DEA-86 filled by FC at each stage -->
+        <span>Schedule I-II Examination Protocol · DEA-86 Worksheet</span>
+        <span style="margin-left:auto; font-size:9.5px; color: var(--text-tertiary);">ANAB ISO 17025 · SWGDRUG · SOP-CHEM-407</span>
+      </div>
+      <div style="padding: 26px;" id="stages-list"></div>
+    </div>
+
+    <aside>
+      <div class="card mb-4" style="padding: 20px;">
+        <div style="font-size:10px; color: var(--text-secondary); text-transform:uppercase; letter-spacing:0.16em; font-weight:600; margin-bottom:14px;">Active Stage · DEA-86 Worksheet Open</div>
+        <div class="flex items-center gap-3 mb-2">
+          <div style="width:42px; height:42px; background: var(--gold-soft); border: 1px solid var(--gold); border-radius: 5px; display:flex; align-items:center; justify-content:center;">
+            <i data-lucide="test-tube-2" style="color: var(--gold); width:18px; height:18px;"></i>
+          </div>
+          <div>
+            <div style="font-family: var(--display); font-size:16px; font-weight:500;">Presumptive Color Testing</div>
+            <div style="font-family: var(--mono); font-size: 11px; color: var(--text-secondary);">Stage 04 of 09 · DEA-86 §3</div>
+          </div>
+        </div>
+        <div style="height:5px; background: var(--bg-inset); border-radius:3px; overflow:hidden; margin-top:14px;">
+          <div style="width:65%; height:100%; background: var(--gold);"></div>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-top:6px; font-family: var(--mono); font-size:10.5px; color: var(--text-secondary);">
+          <span>65% complete</span><span>~4 min remaining</span>
+        </div>
+        <div style="padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border);">
+          <!-- FC = Forensic Chemist (§7301.1) -->
+          <div class="policy-row"><span class="lbl">FC (Forensic Chemist)</span><span class="val">Dr. M. Hernandez</span></div>
+          <div class="policy-row"><span class="lbl">Bench / Station</span><span class="val">Wet Chem Bench W-3</span></div>
+          <div class="policy-row"><span class="lbl">LIMS Case</span><span class="val">SFL3-2026-04781</span></div>
+          <div class="policy-row"><span class="lbl">Stage started</span><span class="val">15:44</span></div>
+          <!-- FC has 30-day possession limit per §7305.12 -->
+          <div class="policy-row"><span class="lbl">FC possession deadline</span><span class="val">27 Jun 2026 (§7305.12)</span></div>
+        </div>
+      </div>
+
+      <div class="card mb-4" style="padding: 20px;">
+        <div style="font-size:10px; color: var(--text-secondary); text-transform:uppercase; letter-spacing:0.16em; font-weight:600; margin-bottom:12px;">Preliminary Reagent Indicators · DEA-86</div>
+        <div class="reagent-row"><span class="name">Marquis</span><span class="result pos"><span class="dot"></span>Yellow → Orange</span></div>
+        <div class="reagent-row"><span class="name">Mecke</span><span class="result pos"><span class="dot"></span>Light yellow</span></div>
+        <div class="reagent-row"><span class="name">Scott's (cobalt thiocyanate)</span><span class="result pos"><span class="dot"></span>Blue (2-phase)</span></div>
+        <div class="reagent-row"><span class="name">Mandelin</span><span class="result pending"><i data-lucide="loader-2" style="width:11px; height:11px;"></i>In progress</span></div>
+        <div style="margin-top:14px; padding: 11px 13px; background: var(--gold-soft); border-radius:4px; font-size:11.5px; line-height:1.5; border-left: 2px solid var(--gold);">
+          <i data-lucide="alert-triangle" style="width:11px; height:11px; color: var(--gold); display:inline; vertical-align:-1px; margin-right:5px;"></i>
+          <b>Indicative</b> for cocaine HCl · pending confirmatory GC-MS for evidential certainty per SWGDRUG. DEA-86 §3 open.
+        </div>
+      </div>
+
+      <div class="card" style="padding: 20px;">
+        <div style="font-size:10px; color: var(--text-secondary); text-transform:uppercase; letter-spacing:0.16em; font-weight:600; margin-bottom:12px;">LIMS Activity · DEA-12 Transfers</div>
+        <div class="activity-item"><span class="t">15:44</span><span class="txt">Stage 4 commenced · DEA-86 §3 opened by FC Hernandez</span></div>
+        <div class="activity-item"><span class="t">15:14</span><span class="txt">FC sub-sampled 2.1 g into SSEE V-content-882 · DEA-86 §2 complete</span></div>
+        <div class="activity-item"><span class="t">14:52</span><span class="txt">LIMS: exhibit transferred to FC Dr. M. Hernandez (case assignment)</span></div>
+        <div class="activity-item"><span class="t">14:41</span><span class="txt">FC macroscopic exam complete · clean white powder, no foreign matter</span></div>
+        <div class="activity-item"><span class="t">14:22</span><span class="txt">ES accepted into LIMS · LIMS label SFL3-2026-04781 affixed · DEA-7 scanned to case file</span></div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ============ LAB MANAGEMENT ============ -->
+<section class="tab-content" id="tab-lab">
+  <div class="page-header">
+    <div>
+      <div class="eyebrow">LIMS OPERATIONS DASHBOARD</div>
+      <h1 class="h1">Network Capacity &amp; Throughput</h1>
+    </div>
+    <div class="flex items-center gap-2">
+      <select class="input" style="width:auto;"><option>All SFLs</option></select>
+      <select class="input" style="width:auto;"><option>Past 7 days</option><option>Past 30 days</option></select>
+      <button class="btn btn-ghost"><i data-lucide="download"></i>Export DEA-307</button>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="kpi-label"><i data-lucide="beaker"></i>Active LIMS submissions</div>
+      <div class="kpi-value-row"><span class="kpi-value">312</span><span class="kpi-delta up"><i data-lucide="trending-up" style="width:10px; height:10px;"></i>+24</span></div>
+      <div class="kpi-hint">Across 9 SFLs</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label"><i data-lucide="clock"></i>Median TAT (priority)</div>
+      <div class="kpi-value-row"><span class="kpi-value">4.2<span class="unit">h</span></span><span class="kpi-delta down-good"><i data-lucide="trending-down" style="width:10px; height:10px;"></i>-0.4h</span></div>
+      <div class="kpi-hint">Receipt → DEA-113 issued</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label"><i data-lucide="activity"></i>Network capacity</div>
+      <div class="kpi-value-row"><span class="kpi-value">68<span class="unit">%</span></span><span class="kpi-delta up"><i data-lucide="trending-up" style="width:10px; height:10px;"></i>+5%</span></div>
+      <div class="kpi-hint">Capacity utilized across SFLs</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label"><i data-lucide="check-circle-2"></i>On-time DEA-113 delivery</div>
+      <div class="kpi-value-row"><span class="kpi-value">94.7<span class="unit">%</span></span><span class="kpi-delta up"><i data-lucide="trending-up" style="width:10px; height:10px;"></i>+1.2%</span></div>
+      <div class="kpi-hint">SLA compliance</div>
+    </div>
+  </div>
+
+  <div class="grid-12-7-5 mb-6">
+    <div class="chart-card">
+      <div class="chart-card-head">
+        <div><div class="chart-card-eyebrow">LIMS Submission Volume · 7 Days</div><div class="chart-card-title">Received vs DEA-113 Issued</div></div>
+        <div class="chart-legend">
+          <span class="legend-item"><span class="legend-dot" style="background: var(--accent);"></span>Received by ES</span>
+          <span class="legend-item"><span class="legend-dot" style="background: var(--gold);"></span>DEA-113 Issued</span>
+          <span class="legend-item"><span class="legend-dot" style="background: var(--text-tertiary);"></span>Pending</span>
+        </div>
+      </div>
+      <div id="volume-chart" style="height: 240px;"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-head">
+        <div><div class="chart-card-eyebrow">TAT: ES Acceptance → DEA-113</div><div class="chart-card-title">Turnaround hours</div></div>
+        <div class="chart-legend">
+          <span class="legend-item"><span class="legend-dot" style="background: var(--gold);"></span>Priority</span>
+          <span class="legend-item"><span class="legend-dot" style="background: var(--text-secondary);"></span>Standard</span>
+        </div>
+      </div>
+      <div id="tat-chart" style="height: 240px;"></div>
+    </div>
+  </div>
+
+  <div class="card mb-6">
+    <div class="card-section-label">
+      <span>SFL Capacity · LIMS Live</span>
+      <span style="margin-left:auto; font-size:9.5px; color: var(--text-tertiary);">Annual Evidence Inventory per LOM §7304 · Last audit: 15 Apr 2026</span>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="data-table">
+        <thead>
+          <tr><th>Laboratory (SFL)</th><th>Location</th><th>LIMS Queue</th><th>In-Process</th><th>Capacity</th><th>Avg TAT</th><th>Status</th></tr>
+        </thead>
+        <tbody id="lab-capacity-table"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid-12-5-7">
+    <div class="card">
+      <div class="card-section-label">
+        <i data-lucide="users" style="width:14px; height:14px;"></i>
+        <!-- FC = Forensic Chemist; the role that analyzes and completes DEA-86 worksheets -->
+        <span>Forensic Chemist (FC) Roster</span>
+        <span style="margin-left:auto; font-size:10px; color: var(--text-secondary); text-transform:none; letter-spacing:0;">8 on duty · LOM §7301.1</span>
+      </div>
+      <div id="analysts-list"></div>
+    </div>
+    <div class="card">
+      <div class="card-section-label">
+        <i data-lucide="cpu" style="width:14px; height:14px;"></i>
+        <span>Instrument Availability · SFL3 MARL</span>
+        <span style="margin-left:auto; font-size:10px; color: var(--text-secondary); text-transform:none; letter-spacing:0;">8 instruments</span>
+      </div>
+      <div id="instruments-list"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ AUDIT TRAIL ============ -->
+<section class="tab-content" id="tab-audit">
+  <div class="page-header">
+    <div>
+      <div class="eyebrow">LIMS IMMUTABLE EVIDENCE LOG</div>
+      <h1 class="h1">Audit Trail · LIMS Chain of Custody</h1>
+      <!-- Per §7308.1D: case files must include chain of custody documentation; §7305.D: logbook used when LIMS is down -->
+      <p class="lede">Cryptographically signed, append-only record of every LIMS transaction — DEA-7 acceptance, DEA-12 custody transfers, DEA-86 worksheet events, DEA-113 dissemination, ES/FC/LAO/LD actions and access events. Compliant with LOM §7308, 28 CFR §23 and FRE 901.</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <button class="btn btn-ghost"><i data-lucide="shield-check"></i>Verify Merkle chain</button>
+      <!-- DEA-307 = Evidence Accountability Record; exported as signed log -->
+      <button class="btn btn-ghost"><i data-lucide="download"></i>Export signed DEA-307</button>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="kpi-label"><i data-lucide="file-text"></i>LIMS events today</div>
+      <div class="kpi-value-row"><span class="kpi-value">2,418</span><span class="kpi-delta up"><i data-lucide="trending-up" style="width:10px; height:10px;"></i>+184</span></div>
+      <div class="kpi-hint">All SFLs · auto-sealed</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label"><i data-lucide="users"></i>Active LIMS actors</div>
+      <div class="kpi-value-row"><span class="kpi-value">147</span></div>
+      <div class="kpi-hint">SAs, FCs, ESs, LAOs, LDs</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label"><i data-lucide="alert-octagon"></i>Critical events</div>
+      <div class="kpi-value-row"><span class="kpi-value" style="color: var(--evidence);">2</span><span class="kpi-delta" style="color: var(--text-secondary);">past 24h</span></div>
+      <div class="kpi-hint">Reviewed by LD / OPR referred</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label"><i data-lucide="shield-check"></i>Chain integrity</div>
+      <div class="kpi-value-row"><span class="kpi-value" style="color: var(--success);">100<span class="unit">%</span></span></div>
+      <div class="kpi-hint">SHA-256 Merkle · verified 04:00</div>
+    </div>
+  </div>
+
+  <div class="audit-toolbar">
+    <div class="audit-search">
+      <i data-lucide="search"></i>
+      <input type="text" id="audit-search-input" placeholder="Search exhibit, actor role, DEA-7/DEA-12/DEA-86, IP, hash…" />
+      <span class="clear" id="audit-search-clear" onclick="clearSearch()"><i data-lucide="x" style="width:14px; height:14px;"></i></span>
+    </div>
+    <select class="audit-filter" id="filter-category">
+      <option value="all">All event types</option>
+      <option value="Evidence">Evidence / DEA-12</option>
+      <option value="Analyst action">FC / Analyst action</option>
+      <option value="System">LIMS system events</option>
+      <option value="Authorization">Authorizations</option>
+      <option value="Configuration">Configuration</option>
+      <option value="Security">Security events</option>
+      <option value="External access">External access (AUSA)</option>
+    </select>
+    <select class="audit-filter" id="filter-lab">
+      <option value="all">All SFLs</option>
+      <option value="MARL">SFL3 · MARL · Largo, MD</option>
+      <option value="NERL">SFL2 · NERL · New York, NY</option>
+      <option value="SERL">SFL4 · SERL · Miami, FL</option>
+      <option value="NCRL">SFL5 · NCRL · Chicago, IL</option>
+      <option value="SCRL">SFL6 · SCRL · Dallas, TX</option>
+      <option value="SWRL">SFL8 · SWRL · Vista, CA</option>
+      <option value="WRL">SFL7 · WRL · Pleasanton, CA</option>
+      <option value="STRL">SFL1 · STRL · Sterling, VA</option>
+      <option value="NELAB">SFL10 · NELAB · Manchester, NH</option>
+      <option value="system">System / no SFL</option>
+    </select>
+    <select class="audit-filter" id="filter-severity">
+      <option value="all">All severities</option>
+      <option value="critical">Critical</option>
+      <option value="high">High</option>
+      <option value="standard">Standard</option>
+    </select>
+    <select class="audit-filter" id="filter-time">
+      <option value="24h">Last 24 hours</option>
+      <option value="7d">Last 7 days</option>
+      <option value="30d">Last 30 days</option>
+      <option value="all">All time</option>
+    </select>
+    <button class="filter-clear-btn" id="filter-clear" onclick="clearAllFilters()" style="display:none;">
+      <i data-lucide="x-circle"></i>Clear filters
+    </button>
+  </div>
+
+  <div class="card">
+    <div class="card-section-label">
+      <span>LIMS Event Stream · DEA-12 / DEA-86 / DEA-113 / DEA-307</span>
+      <span style="margin-left:auto; font-size:9.5px; color: var(--text-tertiary); display:flex; align-items:center; gap:8px;">
+        <span style="width:6px; height:6px; background: var(--success); border-radius: 50%; animation: pulse 2s ease-in-out infinite;"></span>
+        <span id="audit-counter">STREAMING · 22 events visible · 2,418 total today</span>
+      </span>
+    </div>
+    <div id="audit-events"></div>
+  </div>
+</section>
+
+<!-- ============ ADMINISTRATION ============ -->
+<section class="tab-content" id="tab-admin">
+  <div class="page-header">
+    <div>
+      <div class="eyebrow">LIMS SYSTEM ADMINISTRATION</div>
+      <h1 class="h1">SFL Network Integrations</h1>
+      <p class="lede">Manage upstream LIMS connections, authentication, and message routing across the DEA forensic laboratory network (SFL1–SFL10). Inter-laboratory transfers governed by LOM §7305.23; no SF authorization required for backlog-assistance routing.</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <button class="btn btn-ghost"><i data-lucide="refresh-cw"></i>Test all LIMS connections</button>
+      <button class="btn btn-primary"><i data-lucide="plus"></i>Add SFL</button>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="kpi-label"><i data-lucide="plug"></i>Active SFL integrations</div>
+      <div class="kpi-value-row"><span class="kpi-value">9<span class="unit">/ 9</span></span></div>
+      <div class="kpi-hint" style="color: var(--success);">SFL1–SFL10 (excl. SFL9 digital)</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label"><i data-lucide="activity"></i>Avg LIMS latency</div>
+      <div class="kpi-value-row"><span class="kpi-value">112<span class="unit">ms</span></span></div>
+      <div class="kpi-hint">p95 across all SFLs</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label"><i data-lucide="server"></i>LIMS messages today</div>
+      <div class="kpi-value-row"><span class="kpi-value">18.7<span class="unit">k</span></span></div>
+      <div class="kpi-hint">0.02% error rate</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label"><i data-lucide="shield-check"></i>Cert expiry (soonest)</div>
+      <div class="kpi-value-row"><span class="kpi-value">154<span class="unit">d</span></span></div>
+      <div class="kpi-hint">SFL1 STRL root CA</div>
+    </div>
+  </div>
+
+  <div class="card mb-6">
+    <div class="card-section-label">
+      <span>Connected SFL Laboratories · SFL1–SFL10</span>
+    </div>
+    <div id="integrations-list"></div>
+  </div>
+
+  <div class="grid-12-6-6">
+    <div class="chart-card">
+      <div class="flex items-center justify-between mb-4">
+        <div class="chart-card-title">Routing Policy · LOM §7305.23</div>
+        <button class="btn btn-text"><i data-lucide="settings"></i>Configure</button>
+      </div>
+      <div class="policy-row"><span class="lbl">Routing strategy</span><span class="val">Specialty + predicted TAT</span></div>
+      <div class="policy-row"><span class="lbl">Specialty match weight</span><span class="val">+40 score</span></div>
+      <div class="policy-row"><span class="lbl">Distance weight (urgent)</span><span class="val">0.05 / mi</span></div>
+      <!-- Per §7305.23A: inter-lab transfer for backlog does not require SF authorization -->
+      <div class="policy-row"><span class="lbl">SF authorization required (§7305.23)</span><span class="val">No · backlog/capacity routing</span></div>
+      <div class="policy-row"><span class="lbl">Capacity reroute threshold</span><span class="val">85% · updated 14:51 today</span></div>
+      <div class="policy-row"><span class="lbl">Required accreditation</span><span class="val">ANAB ISO 17025</span></div>
+      <!-- FC possession limit per §7305.12 -->
+      <div class="policy-row"><span class="lbl">FC possession limit (§7305.12)</span><span class="val">30 calendar days</span></div>
+      <div class="policy-row"><span class="lbl">AUSA deadline proximity boost</span><span class="val">&lt; 72h activates</span></div>
+      <div class="policy-row"><span class="lbl">Non-DEA evidence return (§7305.24)</span><span class="val">Within 30 days of DEA-113</span></div>
+    </div>
+    <div class="chart-card">
+      <div class="flex items-center justify-between mb-4">
+        <div class="chart-card-title">Security &amp; LIMS Compliance</div>
+        <span class="badge-pill b-success"><i data-lucide="check-circle-2"></i>Compliant</span>
+      </div>
+      <div class="policy-row"><span class="lbl">Transport encryption</span><span class="val">mTLS 1.3 mandatory</span></div>
+      <div class="policy-row"><span class="lbl">Message signing</span><span class="val">JWS ES384</span></div>
+      <!-- DEA-307 = Evidence Accountability Record; used for audit -->
+      <div class="policy-row"><span class="lbl">CoC integrity (DEA-307)</span><span class="val">SHA-256 · Merkle log</span></div>
+      <div class="policy-row"><span class="lbl">Identity provider</span><span class="val">DEA Active Directory · PIV</span></div>
+      <div class="policy-row"><span class="lbl">Data residency</span><span class="val">FedRAMP High · CJIS</span></div>
+      <div class="policy-row"><span class="lbl">Standards conformance</span><span class="val">HL7-FHIR R5 · SWGDRUG</span></div>
+      <!-- Annual inventory per LOM §7304 -->
+      <div class="policy-row"><span class="lbl">Annual evidence inventory (§7304)</span><span class="val">Last completed 15 Apr 2026</span></div>
+      <!-- Case file archival per §7308.2 -->
+      <div class="policy-row"><span class="lbl">Case file archival (§7308.2)</span><span class="val">FRC · 8 yr retention · ARCIS</span></div>
+    </div>
+  </div>
+</section>
+
+</div>
+</main>
+
+<div class="toast" id="toast"><i data-lucide="check-circle-2"></i><span id="toast-text"></span></div>
+
+<!-- ============ DATA ============ -->
+<script>
+// SFL codes per LOM 7300 Acronyms page:
+// SFL1=STRL, SFL2=NERL, SFL3=MARL, SFL4=SERL, SFL5=NCRL, SFL6=SCRL, SFL7=WRL, SFL8=SWRL, SFL10=NELAB
+const LABS = [
+  { code:'MARL', sfl:'SFL3',  name:'Mid-Atlantic Laboratory',        city:'Largo, MD',      distance:24,   eta:42,  capacity:71, queue:14, status:'optimal',  specialties:['cocaine','heroin','unknown'],                 instruments:{'GC-MS':'free now','LC-MS/MS':'in 95m','FTIR':'free now'} },
+  { code:'STRL', sfl:'SFL1',  name:'Special Testing & Research Lab', city:'Sterling, VA',   distance:46,   eta:56,  capacity:58, queue:11, status:'optimal',  specialties:['fentanyl','mdma','pressed-tablets','unknown'],instruments:{'GC-MS':'free now','LC-MS/MS':'free now','NMR':'free now'} },
+  { code:'NERL', sfl:'SFL2',  name:'Northeast Laboratory',           city:'New York, NY',   distance:192,  eta:88,  capacity:64, queue:27, status:'available',specialties:['heroin','fentanyl','cocaine'],                instruments:{'GC-MS':'in 32m','LC-MS/MS':'in 45m'} },
+  { code:'NELAB',sfl:'SFL10', name:'New England Laboratory',         city:'Manchester, NH', distance:422,  eta:108, capacity:39, queue:9,  status:'optimal',  specialties:['fentanyl','heroin'],                          instruments:{'GC-MS':'free now','LC-MS/MS':'free now'} },
+  { code:'SERL', sfl:'SFL4',  name:'Southeast Laboratory',           city:'Miami, FL',      distance:1056, eta:184, capacity:82, queue:41, status:'busy',     specialties:['cocaine','methamphetamine'],                  instruments:{'GC-MS':'in 2h','LC-MS/MS':'in 3h'} },
+  { code:'NCRL', sfl:'SFL5',  name:'North Central Laboratory',       city:'Chicago, IL',    distance:705,  eta:142, capacity:67, queue:23, status:'available',specialties:['heroin','methamphetamine'],                   instruments:{'GC-MS':'in 45m','LC-MS/MS':'in 90m'} },
+  { code:'SCRL', sfl:'SFL6',  name:'South Central Laboratory',       city:'Dallas, TX',     distance:1346, eta:218, capacity:74, queue:32, status:'available',specialties:['methamphetamine','cocaine'],                  instruments:{'GC-MS':'in 60m','LC-MS/MS':'in 2h'} },
+  { code:'WRL',  sfl:'SFL7',  name:'Western Laboratory',             city:'Pleasanton, CA', distance:2832, eta:312, capacity:51, queue:16, status:'optimal',  specialties:['methamphetamine','mdma'],                     instruments:{'GC-MS':'free now','LC-MS/MS':'free now'} },
+  { code:'SWRL', sfl:'SFL8',  name:'Southwest Laboratory',           city:'Vista, CA',      distance:2658, eta:296, capacity:87, queue:38, status:'busy',     specialties:['methamphetamine','fentanyl','pressed-tablets'],instruments:{'GC-MS':'in 3h','LC-MS/MS':'in 4h'} },
+];
+
+const SUBSTANCES = {
+  'cocaine-hcl':     { tag:'cocaine',         display:'cocaine',                  formal:'Cocaine HCl' },
+  'cocaine-base':    { tag:'cocaine',         display:'cocaine base',             formal:'Cocaine base (crack)' },
+  'heroin':          { tag:'heroin',          display:'heroin',                   formal:'Heroin' },
+  'fentanyl':        { tag:'fentanyl',        display:'fentanyl',                 formal:'Fentanyl' },
+  'methamphetamine': { tag:'methamphetamine', display:'methamphetamine',          formal:'Methamphetamine' },
+  'mdma':            { tag:'mdma',            display:'MDMA',                     formal:'MDMA' },
+  'm30-tablets':     { tag:'pressed-tablets', display:'counterfeit M30 tablets',  formal:'M30 pressed tablets' },
+  'unknown':         { tag:'unknown',         display:'unknown / suspected Sched I-II', formal:'Unknown substance' },
+};
+
+// DEA-86 = Forensic Chemist Worksheet (§7301.2); filled at each analytical stage
+// DEA-113 = Chemical Analysis Report; issued after technical review + administrative review (§7307)
+// Technical review and administrative review are BOTH mandatory and may not be conducted by report author (§7307.1)
+const PROTOCOL_STAGES = [
+  { id:1, name:'Evidence Receipt & LIMS Acceptance',   icon:'package',       desc:'ES receives exhibit, examines packaging integrity and evidence seal, verifies DEA-7, creates LIMS record, affixes LIMS container label. Initiates laboratory chain of custody. Per LOM §7302.', duration:25, status:'done',   completed:'14:22', analyst:'ES D. Okonkwo',          instrument:'Intake Bay A-2 · Main Vault' },
+  { id:2, name:'Macroscopic Examination',              icon:'eye',           desc:'FC conducts visual and dimensional examination. Documents packaging condition and physical form. DEA-86 §1 completed.',                                                                            duration:15, status:'done',   completed:'14:41', analyst:'FC D. Okonkwo',           instrument:'Examination Suite 3' },
+  { id:3, name:'Sub-sampling & Preparation',           icon:'droplets',      desc:'FC extracts representative aliquot per ANAB-accredited SOP-CHEM-407. Sub-sample sealed in new SSEE. Gross weight recorded. DEA-86 §2 completed.',                                               duration:30, status:'done',   completed:'15:14', analyst:'FC M. Hernandez',         instrument:'Class II Fume Hood F-7' },
+  { id:4, name:'Presumptive Color Testing',            icon:'test-tube-2',   desc:"Marquis, Mecke, Mandelin and Scott's cobalt thiocyanate reagents applied. Positive indicators documented. DEA-86 §3 open.",                                                                       duration:12, status:'active', progress:65,         analyst:'FC M. Hernandez',         instrument:'Wet Chem Bench W-3' },
+  { id:5, name:'FTIR Screening',                      icon:'scan-line',     desc:'ATR-FTIR spectroscopy against DEA Reference Library (DRL). Results support or refute presumptive testing. DEA-86 §4.',                                                                            duration:18, status:'queued', analyst:'FC · awaiting LIMS assignment', instrument:'Bruker Alpha II FTIR-02' },
+  { id:6, name:'GC-MS Confirmatory Analysis',         icon:'flask-conical', desc:'Gas chromatography / mass spectrometry with NIST library matching for definitive identification. Primary confirmatory method per SWGDRUG. DEA-86 §5.',                                           duration:95, status:'queued', analyst:'FC · awaiting LIMS assignment', instrument:'Agilent 7890B / 5977B GCMS-01' },
+  { id:7, name:'Quantification · LC-MS/MS',           icon:'microscope',    desc:'LC-MS/MS quantification for sentencing guideline weight determination. Required for DEA-113 when quantification is requested on DEA-7. DEA-86 §6.',                                              duration:75, status:'queued', analyst:'FC · awaiting LIMS assignment', instrument:'Waters Xevo TQ-S LCMS-03' },
+  // Technical review + administrative review: BOTH mandatory per §7307.1; cannot be author/co-author of records
+  { id:8, name:'Technical Review & Administrative Review', icon:'shield-check', desc:'Independent FC technical reviewer verifies conclusions against data (§7307.1). Separate administrative reviewer checks spelling, unique identifiers, and key info. Neither may be author/co-author of the examination records.', duration:40, status:'queued', analyst:'Technical reviewer · awaiting assignment', instrument:'— · per §7307.1' },
+  // DEA-113 = Chemical Analysis Report; disseminated via LIMS per §7307.2
+  { id:9, name:'DEA-113 Issued & CoC Closure',        icon:'book-lock',     desc:'DEA-113 Chemical Analysis Report issued and disseminated via LIMS (§7307.2). Evidence returned to main vault by FC within 30-day possession limit (§7305.12). Case file archived per §7308.', duration:30, status:'queued', analyst:'LD / LAO · closure authority', instrument:'— · LIMS dissemination' },
+];
+
+const VOLUME_DATA = [
+  { day:'Mon', received:84,  completed:78, pending:32 }, { day:'Tue', received:91,  completed:82, pending:41 },
+  { day:'Wed', received:76,  completed:88, pending:29 }, { day:'Thu', received:103, completed:91, pending:41 },
+  { day:'Fri', received:118, completed:87, pending:72 }, { day:'Sat', received:64,  completed:71, pending:65 },
+  { day:'Sun', received:58,  completed:69, pending:54 },
+];
+const TAT_DATA = [
+  { week:'W-5', priority:6.2, standard:18.4 }, { week:'W-4', priority:5.8, standard:17.1 },
+  { week:'W-3', priority:5.4, standard:16.8 }, { week:'W-2', priority:4.9, standard:15.2 },
+  { week:'W-1', priority:4.6, standard:14.7 }, { week:'This wk', priority:4.2, standard:13.9 },
+];
+
+// FC = Forensic Chemist (§7301.1); ES = Evidence Specialist; LAO = Laboratory Administrative Officer
+const ANALYSTS = [
+  { name:'Dr. M. Hernandez',    role:'Senior Forensic Chemist (FC) · SFL3 MARL', lab:'SFL3', cases:7,  status:'available', avatar:'MH' },
+  { name:'Dr. A. Whitworth',    role:'Principal Forensic Chemist (FC) · SFL3 MARL',lab:'SFL3', cases:4,  status:'court',     avatar:'AW' },
+  { name:'D. Okonkwo',          role:'Forensic Chemist II (FC) · SFL3 MARL',     lab:'SFL3', cases:9,  status:'available', avatar:'DO' },
+  // Quality Manager acts as technical reviewer (§7307.1)
+  { name:'Dr. R. Bhattacharya', role:'Quality Manager · Technical Reviewer · SFL3',lab:'SFL3', cases:2,  status:'reviewing', avatar:'RB' },
+  { name:'Dr. K. Lindqvist',    role:'Senior Forensic Chemist (FC) · SFL1 STRL', lab:'SFL1', cases:6,  status:'available', avatar:'KL' },
+  { name:'P. Adesanya',         role:'Forensic Chemist I (FC) · SFL5 NCRL',      lab:'SFL5', cases:11, status:'busy',      avatar:'PA' },
+  { name:'Dr. L. Park',         role:'Senior Forensic Chemist (FC) · SFL7 WRL',  lab:'SFL7', cases:5,  status:'available', avatar:'LP' },
+  { name:'J. Diaz',             role:'Forensic Chemist II (FC) · SFL4 SERL',     lab:'SFL4', cases:13, status:'busy',      avatar:'JD' },
+];
+
+const INSTRUMENTS = [
+  { id:'GCMS-01', name:'Agilent 7890B / 5977B GCMS',   type:'GC-MS',    lab:'SFL3 MARL', util:87, status:'in-use',      nextFree:'17:40' },
+  { id:'GCMS-02', name:'Thermo TRACE 1310 / ISQ 7000', type:'GC-MS',    lab:'SFL3 MARL', util:62, status:'available',   nextFree:'Now' },
+  { id:'LCMS-03', name:'Waters Xevo TQ-S Micro',       type:'LC-MS/MS', lab:'SFL3 MARL', util:94, status:'in-use',      nextFree:'19:15' },
+  { id:'FTIR-02', name:'Bruker Alpha II ATR-FTIR',     type:'FTIR',     lab:'SFL3 MARL', util:41, status:'available',   nextFree:'Now' },
+  { id:'RAM-01',  name:'Rigaku Progeny ResQ Raman',    type:'Raman',    lab:'SFL1 STRL', util:28, status:'available',   nextFree:'Now' },
+  { id:'GCMS-04', name:'Shimadzu GCMS-QP2020 NX',      type:'GC-MS',    lab:'SFL5 NCRL', util:73, status:'in-use',      nextFree:'18:05' },
+  { id:'LCMS-05', name:'Sciex Triple Quad 5500+',      type:'LC-MS/MS', lab:'SFL7 WRL',  util:12, status:'maintenance', nextFree:'Tomorrow 09:00' },
+  { id:'NMR-01',  name:'Bruker AVANCE 400 MHz',        type:'NMR',      lab:'SFL1 STRL', util:56, status:'available',   nextFree:'Now' },
+];
+
+const INTEGRATIONS = [
+  { code:'MARL', sfl:'SFL3',  name:'Mid-Atlantic Laboratory',        endpoint:'lims.sfl3.dea.gov/v4',          protocol:'HL7-FHIR R5', auth:'PIV + mTLS',    status:'healthy',     latency:42,  lastSync:'12 sec ago', uptime:99.97 },
+  { code:'NERL', sfl:'SFL2',  name:'Northeast Laboratory',           endpoint:'lims.sfl2.dea.gov/v4',          protocol:'HL7-FHIR R5', auth:'PIV + mTLS',    status:'healthy',     latency:88,  lastSync:'38 sec ago', uptime:99.91 },
+  { code:'STRL', sfl:'SFL1',  name:'Special Testing & Research Lab', endpoint:'sfl1-api.dea.gov/integration',  protocol:'REST/JSON',   auth:'OAuth2 + JWT',  status:'healthy',     latency:67,  lastSync:'8 sec ago',  uptime:99.99 },
+  { code:'NELAB',sfl:'SFL10', name:'New England Laboratory',         endpoint:'lims.sfl10.dea.gov/v3',         protocol:'HL7-FHIR R5', auth:'PIV + mTLS',    status:'healthy',     latency:104, lastSync:'22 sec ago', uptime:99.84 },
+  { code:'SERL', sfl:'SFL4',  name:'Southeast Laboratory',           endpoint:'sfl4-fims.dea.gov/api',         protocol:'REST/JSON',   auth:'OAuth2 + mTLS', status:'healthy',     latency:98,  lastSync:'15 sec ago', uptime:99.93 },
+  { code:'NCRL', sfl:'SFL5',  name:'North Central Laboratory',       endpoint:'sfl5-gateway.dea.gov',          protocol:'HL7-FHIR R5', auth:'PIV + mTLS',    status:'degraded',    latency:412, lastSync:'4 min ago',  uptime:98.42 },
+  { code:'SCRL', sfl:'SFL6',  name:'South Central Laboratory',       endpoint:'sfl6-api.dea.gov/v3',           protocol:'REST/JSON',   auth:'OAuth2 + JWT',  status:'healthy',     latency:121, lastSync:'19 sec ago', uptime:99.88 },
+  { code:'WRL',  sfl:'SFL7',  name:'Western Laboratory',             endpoint:'sfl7.dea.gov/integration',      protocol:'HL7-FHIR R5', auth:'PIV + mTLS',    status:'healthy',     latency:156, lastSync:'11 sec ago', uptime:99.95 },
+  { code:'SWRL', sfl:'SFL8',  name:'Southwest Laboratory',           endpoint:'sfl8-fims.dea.gov/api',         protocol:'SOAP 1.2',    auth:'WS-Security',   status:'maintenance', latency:0,   lastSync:'1h 42m ago', uptime:99.12 },
+];
+
+// Audit events use correct DEA roles: ES (Evidence Specialist), FC (Forensic Chemist), LAO, LD, SA, TFO, GS, AUSA
+// Forms referenced: DEA-7, DEA-12, DEA-86, DEA-113, DEA-307
+const AUDIT_EVENTS = [
+  // ES accepts into LIMS (§7302.3): this is when lab CoC begins
+  { time:'16:14:38', date:'28 May', tsHours:1.5,  actor:'ES D. Okonkwo',         actorRole:'Evidence Specialist (ES) · SFL3 MARL', icon:'shield-check',  tone:'success',  action:'Accepted exhibit <code>EX-44291-A</code> into LIMS · LIMS case <code>SFL3-2026-04781</code> created · DEA-7 scanned to case file · SSEE label affixed', ip:'172.18.4.62',   loc:'SFL3 MARL Intake Bay A-2',   hash:'7f3a9c…b021', cat:'Evidence',        severity:'standard', lab:'MARL' },
+  // FC assigned by LAO; LIMS case assignment = authority for FC to possess evidence (§7305.11)
+  { time:'16:09:22', date:'28 May', tsHours:1.6,  actor:'FC M. Hernandez',       actorRole:'Forensic Chemist (FC) · SFL3 MARL',    icon:'test-tube-2',   tone:'gold',     action:'Started Stage 04 (Presumptive Color Testing) on <code>EX-44291-A</code> · DEA-86 §3 opened · 30-day possession clock started (§7305.12)', ip:'172.18.4.88',   loc:'SFL3 MARL Wet Chem W-3',     hash:'e4d7b1…ac39', cat:'Analyst action',  severity:'standard', lab:'MARL' },
+  // LIMS routing event
+  { time:'15:47:11', date:'28 May', tsHours:2.0,  actor:'System',                actorRole:'LIMS Routing Engine',                  icon:'cpu',           tone:'info',     action:'LIMS auto-routed <code>EX-44289-C</code> to <b>SFL5 NCRL</b> per capacity policy (85% threshold) · §7305.23 · no SF authorization required', ip:'\u2014',        loc:'veridex-core-01',            hash:'b8f2e4…7156', cat:'System',          severity:'standard', lab:'NCRL' },
+  // DEA-86 reagent result recorded
+  { time:'15:44:02', date:'28 May', tsHours:2.0,  actor:'FC M. Hernandez',       actorRole:'Forensic Chemist (FC) · SFL3 MARL',    icon:'edit-3',        tone:'gold',     action:'Recorded DEA-86 §3 reagent result: Marquis <b>positive</b> (yellow \u2192 orange) for <code>EX-44291-A</code>', ip:'172.18.4.88',   loc:'SFL3 MARL Wet Chem W-3',     hash:'21c9a8…9f4d', cat:'Analyst action',  severity:'standard', lab:'MARL' },
+  // SA signs CoC (DEA-12 per §7305.2)
+  { time:'15:21:48', date:'28 May', tsHours:2.4,  actor:'SA J. Reyes',           actorRole:'Special Agent (SA) · DEA BWI Group 4',  icon:'file-signature',tone:'success',  action:'Signed DEA-12 CoC entry #3 for <code>EX-44291-A</code> · transfer to SFL3 MARL authorized · GS R. Patel (GS-14) countersigned (§7305.21)', ip:'10.4.221.17',   loc:'BWI Field Office',           hash:'9a3b7f…d214', cat:'Evidence',        severity:'standard', lab:'MARL' },
+  // FC sub-samples (DEA-86 §2)
+  { time:'15:14:30', date:'28 May', tsHours:2.5,  actor:'FC M. Hernandez',       actorRole:'Forensic Chemist (FC) · SFL3 MARL',    icon:'droplets',      tone:'gold',     action:'Sub-sampled 2.1 g from <code>EX-44291-A</code> into SSEE <code>V-content-882</code> · DEA-86 §2 complete · gross weight recorded', ip:'172.18.4.88',   loc:'SFL3 MARL Fume Hood F-7',    hash:'4e1c8d…ba07', cat:'Evidence',        severity:'standard', lab:'MARL' },
+  // GS authorization (GS-14 required per §7305.21)
+  { time:'14:58:19', date:'28 May', tsHours:2.8,  actor:'GS R. Patel',           actorRole:'Group Supervisor (GS-14) · DEA BWI',   icon:'shield-check',  tone:'success',  action:'Countersigned DEA-7 priority escalation for <code>OP-2026-BWI-04781</code> · supervisory authorization for Urgent priority (§7305.21)', ip:'10.4.221.41',   loc:'BWI Field Office',           hash:'c7d3f9…1e88', cat:'Authorization',   severity:'high',     lab:'system' },
+  // LAO configuration change
+  { time:'14:51:02', date:'28 May', tsHours:2.9,  actor:'LAO admin@dea.gov',     actorRole:'Laboratory Administrative Officer (LAO)',icon:'settings',     tone:'info',     action:'Updated LIMS routing policy: capacity reroute threshold <b>80% \u2192 85%</b> · LAO authority (§7301.3D)', ip:'10.1.7.4',      loc:'DEA HQ Pulaski',             hash:'ef8a2c…45b6', cat:'Configuration',   severity:'high',     lab:'system' },
+  // FC macroscopic exam
+  { time:'14:41:55', date:'28 May', tsHours:3.1,  actor:'FC D. Okonkwo',         actorRole:'Forensic Chemist II (FC) · SFL3 MARL', icon:'eye',           tone:'gold',     action:'Completed macroscopic exam of <code>EX-44291-A</code>: clean white powder, no foreign matter · DEA-86 §1 complete', ip:'172.18.4.62',   loc:'SFL3 MARL Exam Suite 3',     hash:'6b4a1d…cf72', cat:'Analyst action',  severity:'standard', lab:'MARL' },
+  // Security event: OPR-level, LD would notify OPR per §7302.12B
+  { time:'14:38:12', date:'28 May', tsHours:3.1,  actor:'System',                actorRole:'LIMS Integrity Monitor',               icon:'alert-octagon', tone:'evidence', action:'Anomalous login attempt: <code>p.adesanya@dea.gov</code> from unrecognized device · MFA challenge issued and passed · LIMS session logged · LD notification threshold met (§7302.12B)', ip:'203.0.113.44',  loc:'SFL5 NCRL · Chicago, IL',    hash:'d2e8f6…9aa1', cat:'Security',        severity:'critical', lab:'NCRL' },
+  // TFO books into field evidence vault (DEA-12)
+  { time:'14:34:07', date:'28 May', tsHours:3.2,  actor:'TFO Holloway',          actorRole:'Task Force Officer (TFO) · Property Custodian', icon:'lock',  tone:'success',  action:'TFO sealed <code>EX-44291-A</code> into field evidence vault · DEA-12 issued · CCTV ref <code>CCTV-BLT-2206</code>', ip:'10.4.221.92',   loc:'Baltimore RO Field Vault',   hash:'8c5e3a…b049', cat:'Evidence',        severity:'standard', lab:'MARL' },
+  // ES verifies seal on receipt (§7302.11)
+  { time:'14:22:38', date:'28 May', tsHours:3.4,  actor:'ES D. Okonkwo',         actorRole:'Evidence Specialist (ES) · SFL3 MARL', icon:'package',       tone:'success',  action:'ES verified evidence seal <code>DEA-887421</code> intact on receipt at SFL3 MARL · LIMS record created · laboratory CoC initiated (§7302.3)', ip:'172.18.4.62',   loc:'SFL3 MARL Intake A-2',       hash:'3f7d9b…12e5', cat:'Evidence',        severity:'standard', lab:'MARL' },
+  // LIMS connector degraded; LD notifies SF per §7302.1J
+  { time:'13:59:44', date:'28 May', tsHours:3.8,  actor:'System',                actorRole:'LIMS Connector · SFL5 NCRL',           icon:'wifi-off',      tone:'evidence', action:'SFL5 NCRL LIMS connector elevated latency (412 ms) · VERIDEX auto-failover to SFL1 STRL for 3 pending exhibits · LD notification queued (§7302.1J)', ip:'\u2014',        loc:'veridex-edge-04',            hash:'aa17be…d931', cat:'System',          severity:'critical', lab:'NCRL' },
+  // Technical review completed (§7307.1) — reviewer is NOT the author
+  { time:'13:42:18', date:'28 May', tsHours:4.1,  actor:'QM Dr. R. Bhattacharya',actorRole:'Quality Manager · Technical Reviewer · SFL3', icon:'check-circle-2', tone:'success', action:'Technical review completed for <code>EX-44188-B</code> (§7307.1) · conclusions consistent with DEA-86 data · DEA-113 approved for dissemination via LIMS', ip:'172.18.4.121',  loc:'SFL3 MARL QM Office',        hash:'1b8e4f…ca20', cat:'Analyst action',  severity:'standard', lab:'MARL' },
+  // AUSA downloads DEA-113 (§7307.2: disseminated via LIMS)
+  { time:'12:18:01', date:'28 May', tsHours:5.5,  actor:'AUSA M. Chen',          actorRole:'Asst. US Attorney · USAO District of MD',icon:'file-text',  tone:'info',     action:'AUSA downloaded DEA-113 Chemical Analysis Report <code>RPT-44188-B-v2</code> from LIMS for grand jury filing', ip:'63.71.4.218',   loc:'USAO District of MD',        hash:'5d9f02…71ab', cat:'External access', severity:'standard', lab:'MARL' },
+  // LAO provisions new FC account (§7301.3D: LAO responsible for evidence handling processes)
+  { time:'11:04:23', date:'28 May', tsHours:6.7,  actor:'LAO admin@dea.gov',     actorRole:'Laboratory Administrative Officer (LAO)',icon:'user-plus',   tone:'info',     action:'Provisioned new FC account: <code>l.park@dea.gov</code> · SFL7 WRL · role: Senior Forensic Chemist (FC) · LIMS access granted', ip:'10.1.7.4',      loc:'DEA HQ Pulaski',             hash:'fa44c1…8b13', cat:'Configuration',   severity:'high',     lab:'WRL' },
+  // Daily Merkle root (§7308: LIMS is electronic case file)
+  { time:'09:30:00', date:'28 May', tsHours:8.3,  actor:'System',                actorRole:'LIMS Integrity Daemon',                icon:'shield-check',  tone:'success',  action:'Daily Merkle root computed and counter-signed by 3 of 3 HSMs. LIMS audit chain verified intact for 14,217 events · DEA-307 sealed', ip:'\u2014',        loc:'veridex-hsm-cluster',        hash:'ROOT \u00b7 0xff\u2026', cat:'System', severity:'standard', lab:'system' },
+  // FC issues DEA-113 (completed case)
+  { time:'22:14:08', date:'27 May', tsHours:19.6, actor:'FC L. Park',            actorRole:'Sr. Forensic Chemist (FC) · SFL7 WRL', icon:'flask-conical', tone:'gold',     action:'GC-MS confirmatory analysis complete for <code>EX-44102-D</code> · DEA-86 §5 closed · DEA-113 draft submitted for technical review · methamphetamine confirmed, 96.4% purity', ip:'10.16.8.44',    loc:'SFL7 WRL Instrument Bay 2',  hash:'7e2b9f…45d3', cat:'Analyst action',  severity:'standard', lab:'WRL' },
+  // AUSA accesses CoC export (DEA-307)
+  { time:'18:42:51', date:'27 May', tsHours:23.1, actor:'AUSA D. Brennan',       actorRole:'Asst. US Attorney · USAO SDNY',        icon:'file-text',     tone:'info',     action:'Downloaded LIMS chain of custody export (DEA-307) for case <code>OP-2026-NYC-03291</code> · SFL2 NERL', ip:'63.71.4.42',    loc:'USAO SDNY',                  hash:'0c4a1e…91b7', cat:'External access', severity:'standard', lab:'NERL' },
+  // FC at STRL submits to NFLIS (novel substance per §7305.27)
+  { time:'14:08:33', date:'27 May', tsHours:27.6, actor:'FC K. Lindqvist',       actorRole:'Sr. Forensic Chemist (FC) · SFL1 STRL',icon:'microscope',   tone:'gold',     action:'DEA-86 closed · novel substance profile for <code>EX-43998-A</code> submitted to NFLIS · unidentified nitazene analog flagged · supplemental DEA-113 to follow (§7307.4)', ip:'10.22.4.118',   loc:'SFL1 STRL Instrument Bay 7', hash:'b5c8d2…3f04', cat:'Analyst action',  severity:'high',     lab:'STRL' },
+  // mTLS cert rotation (LAO / admin)
+  { time:'11:55:09', date:'27 May', tsHours:29.8, actor:'LAO admin@dea.gov',     actorRole:'Laboratory Administrative Officer (LAO)',icon:'key-round',   tone:'info',     action:'Rotated mTLS certificate for SFL6 SCRL connector · new fingerprint <code>SHA256:8f4a\u2026</code> · LIMS connector test passed', ip:'10.1.7.4',      loc:'DEA HQ Pulaski',             hash:'d9e1f8…7a22', cat:'Configuration',   severity:'high',     lab:'SCRL' },
+  // Daily Merkle root (previous day)
+  { time:'08:14:22', date:'27 May', tsHours:33.5, actor:'System',                actorRole:'LIMS Integrity Daemon',                icon:'shield-check',  tone:'success',  action:'Daily Merkle root computed and counter-signed by 3 of 3 HSMs. LIMS audit chain verified intact for 13,892 events · DEA-307 sealed', ip:'\u2014',        loc:'veridex-hsm-cluster',        hash:'ROOT \u00b7 0xea\u2026', cat:'System', severity:'standard', lab:'system' },
+];
+
+// ============= ROUTING ENGINE =============
+function scoreLab(lab, substance, priority, quantification) {
+  let factors = [], score = 100;
+  const isSpec = lab.specialties.includes(substance.tag);
+  if (isSpec) { score += 40; factors.push({ kind:'specialty', text:'Specialized in ' + substance.display + ' analysis', weight:40 }); }
+  const dw = priority==='urgent' ? 0.05 : priority==='priority' ? 0.025 : 0.01;
+  score -= lab.distance * dw;
+  if (lab.distance < 100 && priority==='urgent') { factors.push({ kind:'proximity', text:'Proximity reduces DEA-12 transport chain-of-custody risk', weight:10 }); }
+  else if (lab.distance < 300 && priority!=='standard') { factors.push({ kind:'proximity', text:'Within regional SFL radius', weight:5 }); }
+  if (lab.capacity > 85) { score -= 20; factors.push({ kind:'cap-neg', text:'SFL at high utilization (' + lab.capacity + '%) — reroute threshold 85%', weight:-20 }); }
+  else if (lab.capacity < 60) { score += 5; factors.push({ kind:'capacity', text:'LIMS capacity headroom available (' + lab.capacity + '%)', weight:5 }); }
+  score -= lab.queue * 0.4;
+  if (lab.queue < 15) { factors.push({ kind:'queue', text:'Short LIMS queue (' + lab.queue + ' exhibits ahead)', weight:4 }); }
+  if (lab.status==='optimal') { score += 10; }
+  else if (lab.status==='busy') { score -= 15; factors.push({ kind:'busy', text:'SFL status: BUSY', weight:-15 }); }
+  if (quantification==='yes') {
+    const lcms = lab.instruments['LC-MS/MS'];
+    if (lcms==='free now') { score += 6; factors.push({ kind:'instrument', text:'LC-MS/MS available immediately for DEA-113 quantification', weight:6 }); }
+  } else {
+    const gcms = lab.instruments['GC-MS'];
+    if (gcms==='free now') { score += 4; factors.push({ kind:'instrument', text:'GC-MS available immediately for confirmatory analysis', weight:4 }); }
+  }
+  return { lab, score, factors, isSpec };
+}
+
+function recommendLab() {
+  const sv = document.getElementById('input-substance').value;
+  const pv = document.getElementById('input-priority').value;
+  const qv = document.getElementById('input-quant').value;
+  const substance = SUBSTANCES[sv];
+  const scored = LABS.map(l => scoreLab(l, substance, pv, qv)).sort((a,b) => b.score - a.score);
+  return { scored, substance, priority: pv };
+}
+
+function statusColor(s) {
+  return s==='optimal' ? 'var(--success)' : s==='busy' ? 'var(--evidence)' : 'var(--info)';
+}
+
+function renderRecommendation() {
+  const { scored, substance, priority } = recommendLab();
+  const top = scored[0];
+  const lab = top.lab;
+  const recBox = document.getElementById('advisor-rec');
+  recBox.classList.add('recalc');
+  setTimeout(() => recBox.classList.remove('recalc'), 200);
+
+  document.getElementById('rec-code').textContent = lab.sfl + ' \u00b7 ' + lab.name;
+  document.getElementById('rec-name').textContent = lab.code + ' \u00b7 ' + lab.city;
+  document.getElementById('rec-loc').textContent = lab.distance.toLocaleString() + ' mi \u00b7 ' + lab.sfl;
+
+  let eta = lab.eta;
+  if (priority==='priority') eta = Math.round(eta * 1.15);
+  if (priority==='standard') eta = Math.round(eta * 1.4);
+  document.getElementById('rec-eta').textContent = eta;
+  document.getElementById('rec-capacity').textContent = lab.capacity;
+  document.getElementById('rec-queue').textContent = lab.queue;
+
+  const badge = document.getElementById('rec-badge');
+  if (top.isSpec) { badge.style.background='var(--gold)'; badge.innerHTML='<i data-lucide="award" style="width:10px; height:10px;"></i>SPECIALTY'; }
+  else if (lab.status==='optimal') { badge.style.background='var(--success)'; badge.innerHTML='<i data-lucide="check-circle-2" style="width:10px; height:10px;"></i>OPTIMAL'; }
+  else { badge.style.background='var(--info)'; badge.innerHTML='<i data-lucide="check-circle-2" style="width:10px; height:10px;"></i>AVAILABLE'; }
+
+  const positives = top.factors.filter(f => f.weight > 0).sort((a,b) => b.weight - a.weight);
+  let hl = '';
+  if (top.isSpec) hl = '<b>Why this SFL:</b> DEA network specialty for ' + substance.display + ', balanced against priority and proximity. LIMS case assignment will transfer to FC.';
+  else if (lab.distance < 100 && priority==='urgent') hl = '<b>Why this SFL:</b> Closest ANAB-accredited SFL to the seizure point under urgent priority · minimizes DEA-12 transport.';
+  else if (priority==='standard') hl = '<b>Why this SFL:</b> Best-fit on LIMS capacity and instrument availability under standard TAT.';
+  else hl = '<b>Why this SFL:</b> Top-scoring SFL on LIMS queue, capacity, instrument readiness, and DEA-113 turnaround.';
+  document.getElementById('rec-headline').innerHTML = hl;
+  document.getElementById('rec-factors').innerHTML = positives.slice(0,3).map(f => '<span class="factor">' + f.text + '</span>').join('');
+
+  document.getElementById('submit-btn-lab').textContent = lab.sfl + ' \u00b7 ' + lab.code;
+
+  const alt = document.getElementById('alternates-list');
+  alt.innerHTML = scored.slice(1).map(s => {
+    const l = s.lab;
+    return '<div class="lab-row">' +
+      '<div class="lab-row-top">' +
+        '<div style="min-width:0; flex:1;">' +
+          '<div class="sfl">' + l.sfl + '</div>' +
+          '<div class="code">' + l.code + ' \u00b7 DEA</div>' +
+          '<div class="name">' + l.name + '</div>' +
+          '<div class="loc">' + l.city + ' \u00b7 ' + l.distance.toLocaleString() + ' mi</div>' +
+          (s.isSpec ? '<div class="specialty-match"><i data-lucide="award"></i>Specialty match</div>' : '') +
+        '</div>' +
+        '<div class="eta">' +
+          '<div><span class="num">' + l.eta + '</span><span class="unit">min</span></div>' +
+          '<div class="status" style="color:' + statusColor(l.status) + ';"><span class="dot" style="background:' + statusColor(l.status) + ';"></span>' + l.status + '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  document.getElementById('alt-count').textContent = scored.length - 1;
+  lucide.createIcons();
+}
+
+// ============= TAB SWITCHING =============
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const id = btn.dataset.tab;
+    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + id).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => lucide.createIcons(), 50);
+  });
+});
+
+// ============= PROTOCOL STAGES =============
+function renderStages() {
+  const el = document.getElementById('stages-list');
+  el.innerHTML = PROTOCOL_STAGES.map((s, i) => {
+    const isLast = i === PROTOCOL_STAGES.length - 1;
+    const isDone = s.status === 'done', isActive = s.status === 'active', isQ = s.status === 'queued';
+    return '<div class="stage">' +
+      (!isLast ? '<div class="stage-line ' + (isDone?'done':isActive?'active':'') + '"></div>' : '') +
+      '<div class="stage-marker ' + (isDone?'done':isActive?'active':'') + '"><i data-lucide="' + (isActive?'loader-2':s.icon) + '"></i></div>' +
+      '<div class="stage-right"><div style="flex:1; min-width:0;">' +
+        '<div class="stage-head">' +
+          '<span class="stage-num">' + String(s.id).padStart(2,'0') + '</span>' +
+          '<span class="stage-title ' + (isQ?'muted':'') + '">' + s.name + '</span>' +
+          (isDone   ? '<span class="badge-pill b-success"><i data-lucide="check-circle-2"></i>Complete</span>' : '') +
+          (isActive ? '<span class="badge-pill b-gold"><i data-lucide="circle-dot"></i>In progress</span>' : '') +
+          (isQ      ? '<span class="badge-pill b-neutral"><i data-lucide="clock"></i>Queued</span>' : '') +
+        '</div>' +
+        '<p class="stage-desc">' + s.desc + '</p>' +
+        '<div class="stage-meta">' +
+          '<span><i data-lucide="user"></i>' + s.analyst + '</span>' +
+          '<span><i data-lucide="cpu"></i>' + s.instrument + '</span>' +
+          '<span><i data-lucide="clock"></i>~' + s.duration + 'm</span>' +
+        '</div>' +
+      '</div>' +
+      '<div style="text-align:right; min-width:80px;">' +
+        (isDone   ? '<div class="stage-complete-time">\u2713 ' + s.completed + '</div>' : '') +
+        (isActive ? '<div class="stage-progress-num">' + s.progress + '%</div><div class="stage-progress-bar"><div style="width:' + s.progress + '%;"></div></div>' : '') +
+      '</div></div></div>';
+  }).join('');
+}
+
+// ============= CHARTS =============
+function renderVolumeChart() {
+  const el = document.getElementById('volume-chart');
+  if (!el) return;
+  const w = el.clientWidth, h = 240, p = { t:12, r:8, b:30, l:36 };
+  const iw = w - p.l - p.r, ih = h - p.t - p.b;
+  const maxV = Math.max(...VOLUME_DATA.flatMap(d => [d.received, d.completed, d.pending])) * 1.15;
+  const gw = iw / VOLUME_DATA.length, bw = (gw - 16) / 3;
+  const colors = { received:'var(--accent)', completed:'var(--gold)', pending:'var(--text-tertiary)' };
+  let bars = '', gLines = '', yLbls = '';
+  [0,30,60,90,120].forEach(t => {
+    const y = p.t + ih - (t/maxV)*ih;
+    gLines += '<line x1="' + p.l + '" y1="' + y + '" x2="' + (w-p.r) + '" y2="' + y + '" stroke="var(--border)" stroke-dasharray="2 3" stroke-width="1"/>';
+    yLbls += '<text x="' + (p.l-8) + '" y="' + (y+4) + '" text-anchor="end" font-size="10.5" font-family="var(--mono)" fill="var(--text-tertiary)">' + t + '</text>';
+  });
+  let xLbls = '';
+  VOLUME_DATA.forEach((d,i) => {
+    const x = p.l + i*gw + 8;
+    ['received','completed','pending'].forEach((k,j) => {
+      const bh = (d[k]/maxV)*ih, y = p.t + ih - bh;
+      bars += '<rect x="' + (x+j*bw) + '" y="' + y + '" width="' + (bw-2) + '" height="' + bh + '" fill="' + colors[k] + '" rx="1.5"/>';
+    });
+    xLbls += '<text x="' + (p.l + i*gw + gw/2) + '" y="' + (h-10) + '" text-anchor="middle" font-size="11" fill="var(--text-secondary)">' + d.day + '</text>';
+  });
+  el.innerHTML = '<svg width="' + w + '" height="' + h + '">' + gLines + bars + yLbls + xLbls + '</svg>';
+}
+
+function renderTATChart() {
+  const el = document.getElementById('tat-chart');
+  if (!el) return;
+  const w = el.clientWidth, h = 240, p = { t:12, r:16, b:30, l:36 };
+  const iw = w-p.l-p.r, ih = h-p.t-p.b, maxV = 22;
+  const px = i => p.l + (i/(TAT_DATA.length-1))*iw;
+  const py = v => p.t + ih - (v/maxV)*ih;
+  const path = k => TAT_DATA.map((d,i) => (i===0?'M':'L') + ' ' + px(i) + ' ' + py(d[k])).join(' ');
+  const area = k => path(k) + ' L ' + px(TAT_DATA.length-1) + ' ' + (p.t+ih) + ' L ' + px(0) + ' ' + (p.t+ih) + ' Z';
+  let gLines = '', yLbls = '', xLbls = '', dots = '';
+  [0,5,10,15,20].forEach(t => {
+    const y = py(t);
+    gLines += '<line x1="' + p.l + '" y1="' + y + '" x2="' + (w-p.r) + '" y2="' + y + '" stroke="var(--border)" stroke-dasharray="2 3" stroke-width="1"/>';
+    yLbls += '<text x="' + (p.l-8) + '" y="' + (y+4) + '" text-anchor="end" font-size="10.5" font-family="var(--mono)" fill="var(--text-tertiary)">' + t + 'h</text>';
+  });
+  TAT_DATA.forEach((d,i) => {
+    xLbls += '<text x="' + px(i) + '" y="' + (h-10) + '" text-anchor="middle" font-size="11" fill="var(--text-secondary)">' + d.week + '</text>';
+    dots += '<circle cx="' + px(i) + '" cy="' + py(d.priority) + '" r="4" fill="var(--bg-surface)" stroke="var(--gold)" stroke-width="2"/>';
+  });
+  el.innerHTML = '<svg width="' + w + '" height="' + h + '">' +
+    '<defs><linearGradient id="gp" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--gold)" stop-opacity="0.25"/><stop offset="100%" stop-color="var(--gold)" stop-opacity="0"/></linearGradient>' +
+    '<linearGradient id="gs" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--text-secondary)" stop-opacity="0.18"/><stop offset="100%" stop-color="var(--text-secondary)" stop-opacity="0"/></linearGradient></defs>' +
+    gLines +
+    '<path d="' + area('standard') + '" fill="url(#gs)"/><path d="' + path('standard') + '" stroke="var(--text-secondary)" stroke-width="1.5" fill="none"/>' +
+    '<path d="' + area('priority') + '" fill="url(#gp)"/><path d="' + path('priority') + '" stroke="var(--gold)" stroke-width="2" fill="none"/>' +
+    dots + yLbls + xLbls + '</svg>';
+}
+
+// ============= LAB CAPACITY TABLE =============
+function renderLabCapacity() {
+  const tbody = document.getElementById('lab-capacity-table');
+  tbody.innerHTML = LABS.map(lab => {
+    const capColor = lab.capacity > 80 ? 'var(--evidence)' : lab.capacity > 60 ? 'var(--gold)' : 'var(--success)';
+    const badgeCls = lab.status==='optimal' ? 'b-success' : lab.status==='busy' ? 'b-evidence' : 'b-info';
+    return '<tr>' +
+      '<td><div style="font-weight:500;">' + lab.name + '</div><div class="font-mono" style="font-size:10px; color: var(--accent); margin-top:2px;">' + lab.sfl + ' \u00b7 ' + lab.code + '</div></td>' +
+      '<td style="color: var(--text-secondary);">' + lab.city + '</td>' +
+      '<td class="font-mono">' + lab.queue + '</td>' +
+      '<td class="font-mono">' + Math.round(lab.queue * 0.6) + '</td>' +
+      '<td style="min-width:180px;"><div class="util-bar"><div class="bar"><div style="width:' + lab.capacity + '%; background:' + capColor + ';"></div></div><span class="pct">' + lab.capacity + '%</span></div></td>' +
+      '<td class="font-mono">' + Math.round(lab.eta * 1.4) + 'm</td>' +
+      '<td><span class="badge-pill ' + badgeCls + '"><span style="width:5px; height:5px; border-radius:50%; background:currentColor;"></span>' + lab.status + '</span></td>' +
+    '</tr>';
+  }).join('');
+}
+
+// ============= FC ROSTER =============
+function renderAnalysts() {
+  const el = document.getElementById('analysts-list');
+  el.innerHTML = ANALYSTS.map(a => {
+    const badgeCls = a.status==='available' ? 'b-success' : a.status==='busy' ? 'b-evidence' : 'b-info';
+    return '<div class="roster-row"><div class="avatar">' + a.avatar + '</div>' +
+      '<div class="info"><div class="nm">' + a.name + '</div><div class="role">' + a.role + '</div></div>' +
+      '<div class="right"><div class="cs">' + a.cases + ' LIMS cases</div><span class="badge-pill ' + badgeCls + '" style="font-size:9px; margin-top:3px;">' + a.status + '</span></div>' +
+    '</div>';
+  }).join('');
+}
+
+// ============= INSTRUMENTS =============
+function renderInstruments() {
+  const el = document.getElementById('instruments-list');
+  el.innerHTML = INSTRUMENTS.map(ins => {
+    const uc = ins.util > 80 ? 'var(--evidence)' : ins.util > 50 ? 'var(--gold)' : 'var(--success)';
+    const bc = ins.status==='available' ? 'b-success' : ins.status==='maintenance' ? 'b-info' : 'b-gold';
+    return '<div class="instrument-row">' +
+      '<div class="code">' + ins.id + '</div>' +
+      '<div><div class="name">' + ins.name + '</div><div class="meta">' + ins.type + ' \u00b7 ' + ins.lab + '</div></div>' +
+      '<div class="util-bar"><div class="bar"><div style="width:' + ins.util + '%; background:' + uc + ';"></div></div><span class="pct">' + ins.util + '%</span></div>' +
+      '<span class="badge-pill ' + bc + '" style="font-size:9px;">' + ins.status + '</span>' +
+      '<div class="font-mono" style="font-size:10px; color: var(--text-secondary); text-align:right;">' + ins.nextFree + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+// ============= SFL INTEGRATIONS =============
+function renderIntegrations() {
+  const el = document.getElementById('integrations-list');
+  const sm = { healthy:{ color:'var(--success)', bg:'var(--success-soft)', icon:'wifi', label:'Healthy' }, degraded:{ color:'var(--gold)', bg:'var(--gold-soft)', icon:'alert-triangle', label:'Degraded' }, maintenance:{ color:'var(--info)', bg:'var(--info-soft)', icon:'power', label:'Maintenance' } };
+  el.innerHTML = INTEGRATIONS.map(int => {
+    const s = sm[int.status];
+    const bc = int.status==='healthy' ? 'b-success' : int.status==='degraded' ? 'b-gold' : 'b-info';
+    return '<div class="int-row">' +
+      '<div class="int-left"><div class="int-icon" style="background:' + s.bg + '; border:1px solid ' + s.color + '; color:' + s.color + ';"><i data-lucide="' + s.icon + '"></i></div>' +
+      '<div><div class="int-head"><span class="lab">' + int.name + '</span><span class="sfl-code">' + int.sfl + '</span><span class="code">' + int.code + '</span><span class="badge-pill ' + bc + '">' + s.label + '</span></div>' +
+      '<div class="int-meta"><span><i data-lucide="radio"></i>' + int.endpoint + '</span><span><i data-lucide="hash"></i>' + int.protocol + '</span><span><i data-lucide="key-round"></i>' + int.auth + '</span></div></div></div>' +
+      '<div class="int-right">' +
+        '<div class="int-metric"><div class="lbl">Latency</div><div class="val">' + (int.latency ? int.latency+'ms' : '\u2014') + '</div></div>' +
+        '<div class="int-metric"><div class="lbl">Uptime</div><div class="val">' + int.uptime + '%</div></div>' +
+        '<div class="int-metric"><div class="lbl">LIMS sync</div><div class="val">' + int.lastSync + '</div></div>' +
+        '<button class="btn btn-ghost">Manage<i data-lucide="chevron-right"></i></button>' +
+      '</div></div>';
+  }).join('');
+}
+
+// ============= AUDIT FILTERS =============
+let auditFilters = { search:'', category:'all', lab:'all', severity:'all', time:'24h' };
+
+function highlightMatch(html, query) {
+  if (!query) return html;
+  const safe = query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  return html.replace(new RegExp('(?<!<[^>]*)(' + safe + ')(?![^<]*>)','gi'),'<mark>$1</mark>');
+}
+function stripTags(s) { return s.replace(/<[^>]+>/g,''); }
+
+function eventMatchesFilters(e) {
+  const f = auditFilters;
+  if (f.category !== 'all' && e.cat !== f.category) return false;
+  if (f.lab !== 'all' && e.lab !== f.lab) return false;
+  if (f.severity !== 'all' && e.severity !== f.severity) return false;
+  if (f.time === '24h' && e.tsHours > 24) return false;
+  if (f.search) {
+    const q = f.search.toLowerCase();
+    const hay = [stripTags(e.action), e.actor, e.actorRole, e.ip, e.loc, e.hash, e.cat, e.lab, e.severity].join(' ').toLowerCase();
+    if (!hay.includes(q)) return false;
+  }
+  return true;
+}
+
+function renderAuditEvents() {
+  const el = document.getElementById('audit-events');
+  const filtered = AUDIT_EVENTS.filter(eventMatchesFilters);
+  if (filtered.length === 0) {
+    el.innerHTML = '<div class="audit-empty"><div class="ico"><i data-lucide="search-x"></i></div><div class="title">No LIMS events match current filters</div><div class="desc">Broaden the time window, switch the SFL or category, or clear the search.</div></div>';
+  } else {
+    el.innerHTML = filtered.map(e => {
+      const aHTML = highlightMatch(e.action, auditFilters.search);
+      return '<div class="audit-event">' +
+        '<div class="audit-time">' + e.time + '<span class="date">' + e.date + ' 2026</span></div>' +
+        '<div class="audit-icon ' + e.tone + '"><i data-lucide="' + e.icon + '"></i></div>' +
+        '<div class="audit-body">' +
+          '<div class="action">' + aHTML + '</div>' +
+          '<div class="who"><span><i data-lucide="user"></i>' + e.actor + ' <span style="color:var(--text-tertiary);">\u00b7 ' + e.actorRole + '</span></span>' +
+          '<span><i data-lucide="map-pin"></i>' + e.loc + '</span><span><i data-lucide="globe"></i>' + e.ip + '</span></div>' +
+          '<span class="hash"><i data-lucide="hash"></i>' + e.hash + '</span>' +
+        '</div>' +
+        '<div class="audit-right"><span class="badge-pill b-neutral">' + e.cat + '</span><span class="badge-pill sev-' + e.severity + '">' + e.severity + '</span></div>' +
+      '</div>';
+    }).join('');
+  }
+  const isF = auditFilters.search || auditFilters.category!=='all' || auditFilters.lab!=='all' || auditFilters.severity!=='all' || auditFilters.time!=='24h';
+  document.getElementById('audit-counter').textContent = isF
+    ? 'FILTERED \u00b7 ' + filtered.length + ' of ' + AUDIT_EVENTS.length + ' events shown'
+    : 'STREAMING \u00b7 ' + filtered.length + ' LIMS events visible \u00b7 2,418 total today';
+  document.getElementById('filter-clear').style.display = isF ? 'inline-flex' : 'none';
+  document.getElementById('filter-category').classList.toggle('active', auditFilters.category!=='all');
+  document.getElementById('filter-lab').classList.toggle('active', auditFilters.lab!=='all');
+  document.getElementById('filter-severity').classList.toggle('active', auditFilters.severity!=='all');
+  document.getElementById('filter-time').classList.toggle('active', auditFilters.time!=='24h');
+  lucide.createIcons();
+}
+
+function wireAuditFilters() {
+  document.getElementById('audit-search-input').addEventListener('input', e => { auditFilters.search = e.target.value.trim(); renderAuditEvents(); });
+  document.getElementById('filter-category').addEventListener('change', e => { auditFilters.category = e.target.value; renderAuditEvents(); });
+  document.getElementById('filter-lab').addEventListener('change', e => { auditFilters.lab = e.target.value; renderAuditEvents(); });
+  document.getElementById('filter-severity').addEventListener('change', e => { auditFilters.severity = e.target.value; renderAuditEvents(); });
+  document.getElementById('filter-time').addEventListener('change', e => { auditFilters.time = e.target.value; renderAuditEvents(); });
+}
+
+function clearSearch() { document.getElementById('audit-search-input').value=''; auditFilters.search=''; renderAuditEvents(); }
+function clearAllFilters() {
+  document.getElementById('audit-search-input').value='';
+  document.getElementById('filter-category').value='all';
+  document.getElementById('filter-lab').value='all';
+  document.getElementById('filter-severity').value='all';
+  document.getElementById('filter-time').value='24h';
+  auditFilters = { search:'', category:'all', lab:'all', severity:'all', time:'24h' };
+  renderAuditEvents();
+}
+
+function wireRoutingInputs() {
+  ['input-substance','input-priority','input-quant'].forEach(id => {
+    document.getElementById(id).addEventListener('change', renderRecommendation);
+  });
+}
+
+function submitExhibit() {
+  const lab = document.getElementById('submit-btn-lab').textContent;
+  const t = document.getElementById('toast');
+  document.getElementById('toast-text').textContent = 'DEA-7 transmitted to ' + lab + ' \u00b7 LIMS case created \u00b7 Audit entry sealed (DEA-307)';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+function init() {
+  renderStages(); renderLabCapacity(); renderAnalysts(); renderInstruments();
+  renderIntegrations(); renderRecommendation(); renderAuditEvents();
+  wireRoutingInputs(); wireAuditFilters();
+  renderVolumeChart(); renderTATChart();
+  lucide.createIcons();
+}
+
+window.addEventListener('load', init);
+window.addEventListener('resize', () => { renderVolumeChart(); renderTATChart(); });
+</script>
+</body>
+</html>
